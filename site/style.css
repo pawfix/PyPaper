@@ -1,0 +1,13 @@
+div.container {
+    display: flex;
+    flex-direction: row;
+    max-width: 900px;
+    width: 900px;
+    flex-wrap: wrap;
+
+}
+div.card {
+    display: flex;
+    width: 300px;
+    flex-direction: column;
+}
