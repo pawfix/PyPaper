@@ -1,5 +1,3 @@
-# Imports
-
 import requests # For handling API requests
 import subprocess # Will use for setting wallpaper
 import argparse # For cli arguments
@@ -9,6 +7,7 @@ import tempfile # For enabling temp file used in CLi image
 import sys
 import os
 from api import search_wallpapers
+from typing import Dict, Any
 
 
 
@@ -30,7 +29,6 @@ parser.add_argument(
         action="store_true")
 
 # Argument -i to enable image preview
-
 parser.add_argument(
     "-i",
     "--image",
@@ -38,7 +36,6 @@ parser.add_argument(
     action="store_true")
 
 # Argument -c to use CLI instead of GUI
-
 parser.add_argument(
         "-c",
         "--cli",
@@ -58,7 +55,6 @@ def ownLog(log):
         print(log)
 
 # Display image handler in CLI
-
 def showImage(thumb):
     if args.image:
         if not sys.stdout.isatty():
@@ -91,64 +87,75 @@ if args.download:
         q = input("Search: ")
         data = search_wallpapers(q)
 
-# Get list of wallpapers from recived data
-def getWallpapers(data):
-    
-    ownLog(data) 
-    if data["data"] == []:
-        print("No wallpaper found for your query: " + q)
-        exit()
-    if "data" in data:
-        wallNumber = 1
-        for wallpaper in data["data"]:
-            print("=================")
-            print(wallpaper["id"])
-            showImage(wallpaper["thumbs"]["small"])
-            print(wallpaper["url"])
-            print(wallpaper["path"])
-            print("=================")
-            wallNumber += 1
-    else:
-        print("No data: " + data)
+def get_wallpapers(result: Dict[str, Any], query: str) -> None:
+    ownLog(result)
 
+    if not result.get("success", False):
+        # Report why wallpapers weren't returned
+        error_msg = result.get("error", "Unknown error")
+        status_code = result.get("status_code")
+        if status_code:
+            print(f"Failed to fetch wallpapers (HTTP {status_code}): {error_msg}")
+        else:
+            print(f"Failed to fetch wallpapers: {error_msg}")
+        return
 
-    choiceID = input("Chose wallpaper ID to download: ")
-    if not choiceID:
+    wallpapers = result.get("data", {}).get("data", [])
+    if not wallpapers:
+        print(f"No wallpapers found for your query: '{query}' (API returned empty data).")
+        return
+
+    for idx, wallpaper in enumerate(wallpapers, start=1):
+        print(f"================= Wallpaper {idx} =================")
+        print(f"ID: {wallpaper.get('id')}")
+        showImage(wallpaper["thumbs"]["small"])
+        print(f"URL: {wallpaper.get('url')}")
+        print(f"Path: {wallpaper.get('path')}")
+        print("==================================================")
+
+    # Ask user for a wallpaper ID
+    choice_id = input("Choose wallpaper ID to download: ").strip()
+    if not choice_id:
         print("Enter a proper ID")
     else:
-        downloadWallpaper(choiceID)
+        downloadWallpaper(choice_id)
 
-def downloadWallpaper(ID):
-    url = f"https://wallhaven.cc/api/v1/w/{ID}"
+def downloadWallpaper(ID: str):
+    try:
+        url = f"https://wallhaven.cc/api/v1/w/{ID}"
 
-    response = requests.get(url)
-    data = response.json()
-    image_url = data["data"]["path"]
+        response = requests.get(url, timeout=10)
+        response.raise_for_status()
+        data = response.json()
+        image_url = data["data"]["path"]
 
-    filename = image_url.split("/")[-1]
+        filename = image_url.split("/")[-1]
 
-    os.makedirs("images", exist_ok=True)
+        os.makedirs("images", exist_ok=True)
 
-    filepath = os.path.join("images", filename)
+        filepath = os.path.join("images", filename)
 
-    image = requests.get(image_url, stream=True)
+        image = requests.get(image_url, stream=True, timeout=15)
+        image.raise_for_status()
 
-    total_size = int(image.headers.get("content-length", 0))
-    chunk_size = 1024
+        total_size = int(image.headers.get("content-length", 0))
+        chunk_size = 1024
 
-    with open(filepath, "wb") as f, tqdm(
-        desc=filename,
-        total=total_size,
-        unit="B",
-        unit_scale=True,
-        unit_divisor=1024,
-    ) as bar:
-        for chunk in image.iter_content(chunk_size=chunk_size):
-            if chunk:
-                f.write(chunk)
-                bar.update(len(chunk))
-
+        with open(filepath, "wb") as f, tqdm(
+            desc=filename,
+            total=total_size,
+            unit="B",
+            unit_scale=True,
+            unit_divisor=1024,
+        ) as bar:
+            for chunk in image.iter_content(chunk_size=chunk_size):
+                if chunk:
+                    f.write(chunk)
+                    bar.update(len(chunk))
+        print(f"Downloaded: {filepath}")
+    except requests.exceptions.RequestException as e:
+        print(f"Failed to download wallpaper {ID}: {e}")
+    return filepath
 if args.download:
     if args.cli:
-        getWallpapers(data)
-
+        get_wallpapers(data, q)

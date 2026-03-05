@@ -1,13 +1,48 @@
+body {
+    overflow-x: hidden;
+}
 div.container {
     display: flex;
     flex-direction: row;
-    max-width: 900px;
-    width: 900px;
+    width: 100%;
     flex-wrap: wrap;
 
 }
 div.card {
     display: flex;
-    width: 300px;
+    margin: auto;
+    width: 30%;
     flex-direction: column;
+}
+header {
+    height: 50px;
+    display: flex;
+    flex-direction: row;
+    border-bottom: 5px darkgray double;
+}
+header div {
+    width:30%;
+    margin: auto;
+    text-align: center;
+    cursor: pointer;
+}
+
+main {
+    display: flex;
+    width: 300vw;
+    flex-direction: row;
+    transition: all 0.3s ease-in-out;
+    -webkit-transition: all 0.3s ease-in-out;
+    -moz-transition: all 0.3s ease-in-out;
+    -ms-transition: all 0.3s ease-in-out;
+    -o-transition: all 0.3s ease-in-out;
+}
+main section {
+    width: 90vw;
+    margin: 5vw;
+    transition: all 0.3s ease-in-out;
+    -webkit-transition: all 0.3s ease-in-out;
+    -moz-transition: all 0.3s ease-in-out;
+    -ms-transition: all 0.3s ease-in-out;
+    -o-transition: all 0.3s ease-in-out;
 }
