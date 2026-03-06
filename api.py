@@ -2,23 +2,27 @@ import requests
 
 SEARCH_URL = "https://wallhaven.cc/api/v1/search"
 
-def search_wallpapers(query):
+def search_wallpapers(query, api_key=None, purity=None):
+    print("API is: ", api_key)
     params = {
         "q": query,
         "categories": "111",
-        "purity": "100",
         "sorting": "toplist",
         "order": "desc"
     }
-    
+
+    if api_key:
+        params["apikey"] = api_key
+    if purity:
+        params["purity"] = purity
+    print(params)
     try:
         response = requests.get(SEARCH_URL, params=params, timeout=10)
-        response.raise_for_status()  # Raise HTTPError for bad responses
+        response.raise_for_status()
         return {"success": True, "data": response.json(), "status_code": response.status_code, "error": None}
-    
+
     except requests.exceptions.HTTPError as http_err:
         status = response.status_code
-        # Map HTTP status codes to messages
         status_messages = {
             400: "Bad request – check your query parameters.",
             401: "Unauthorized – API key missing or invalid.",
@@ -28,7 +32,7 @@ def search_wallpapers(query):
         }
         message = status_messages.get(status, f"HTTP error occurred: {http_err}")
         return {"success": False, "data": None, "status_code": status, "error": message}
-    
+
     except requests.exceptions.Timeout:
         return {"success": False, "data": None, "status_code": None, "error": "Request timed out."}
     except requests.exceptions.ConnectionError:

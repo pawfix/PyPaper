@@ -4,8 +4,8 @@ from main import ownLog
 from wallpaper import applyWallpaper
 
 class Api():
-    def getData(self, user_input):
-        data = search_wallpapers(user_input)
+    def getData(self, user_input, key, purity):
+        data = search_wallpapers(user_input, key, purity)
         """Python function that takes input from JS"""
         print(f"Python received input: {user_input}")
         # Example: return some processed data

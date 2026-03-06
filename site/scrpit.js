@@ -26,22 +26,22 @@ function loadWallpaper(id, thumbnail) {
 }
 
 function displayDataError(errorMsg) {
-	container.innerHTML = "<h2>Error: " + errorMsg + "</h2>";
+    container.innerHTML = "<h2>Error: " + errorMsg + "</h2>";
 }
 function displayData(json) {
-	container.innerHTML = ""
+    container.innerHTML = ""
 
-	for (const wallpaper of json.data.data) {
-		loadWallpaper(wallpaper.id, wallpaper.thumbs.small)
-	}
+    for (const wallpaper of json.data.data) {
+        loadWallpaper(wallpaper.id, wallpaper.thumbs.small)
+    }
 
 }
 
-async function getData(input) {
+async function getData(input, api, purity) {
     let recivedData;
     try {
         // Call Python method with input
-        recivedData = await window.pywebview.api.getData(input);
+        recivedData = await window.pywebview.api.getData(input, api, purity);
 
         // Show raw response
         console.log("Python response:", recivedData);
@@ -56,7 +56,7 @@ async function getData(input) {
         const status = recivedData.status_code ? ` (HTTP ${recivedData.status_code})` : "";
         const errorMsg = recivedData.error || "Unknown error";
         console.error("Failed to fetch wallpapers" + status + ": " + errorMsg);
-	displayDataError(errorMsg);
+        displayDataError(errorMsg);
         return;
     }
 
@@ -64,7 +64,7 @@ async function getData(input) {
     const wallpapers = recivedData.data?.data || [];
     if (wallpapers.length === 0) {
         console.warn(`No wallpapers found for your query (API returned empty data).`);
-	displayDataError(`No wallpapers found for your query (API returned empty data).`)
+        displayDataError(`No wallpapers found for your query (API returned empty data).`)
         return;
     }
 
@@ -73,13 +73,15 @@ async function getData(input) {
 }
 // Ensure pywebview API is ready
 window.addEventListener('pywebviewready', function () {
-	const btn = document.getElementById('sendBtn');
+    const btn = document.getElementById('sendBtn');
 
-	btn.addEventListener('click', async function () {
-		const input = document.getElementById('userInput').value;
+    btn.addEventListener('click', async function () {
+        const input = document.getElementById('userInput').value;
+        const api = document.getElementById('apiKey').value;
+        const purity = document.getElementById("purity").value
 
-		getData(input)
-	});
+        getData(input, api, purity);
+    });
 });
 
 
@@ -88,24 +90,24 @@ const header = document.querySelector('header')
 
 header.addEventListener('click', function (event) {
 
-	const target = event.target.closest('.headBtn')
+    const target = event.target.closest('.headBtn')
 
-	if (!target) return
+    if (!target) return
 
-	switch (target.id) {
+    switch (target.id) {
 
-		case 'download':
-			main.style.transform = 'translateX(0vw)'
-			break
+        case 'download':
+            main.style.transform = 'translateX(0vw)'
+            break
 
-		case 'local':
-			main.style.transform = 'translateX(-100vw)'
-			break
+        case 'local':
+            main.style.transform = 'translateX(-100vw)'
+            break
 
-		case 'settings':
-			main.style.transform = 'translateX(-200vw)'
-			break
-	}
+        case 'settings':
+            main.style.transform = 'translateX(-200vw)'
+            break
+    }
 })
 
 

@@ -9,8 +9,6 @@ import os
 from api import search_wallpapers
 from typing import Dict, Any
 
-
-
 # Argument parser for logging
 parser = argparse.ArgumentParser(
                     description='Enable logging')
@@ -42,6 +40,13 @@ parser.add_argument(
         help="Use CLI instead of GUI(also requires -d to download)",
         action="store_true")
 
+# Argument -a to apple wallpaper after download
+parser.add_argument(
+        "-a",
+        "--apply",
+        help="Apply the wallpaper after download",
+        action="store_true")
+
 args = parser.parse_args()
 
 if not args.cli:
@@ -64,7 +69,7 @@ def showImage(thumb):
             response = requests.get(thumb, timeout=10)
             response.raise_for_status()
         except Exception as e:
-            ownLog("Failed to download thumbnail: ", e)
+            ownLog("Failed to download thumbnail: {e}")
             print("Cant download preview")
             return
         with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as tmp:
@@ -82,10 +87,7 @@ def showImage(thumb):
     else:
         return
 
-if args.download:
-    if args.cli:
-        q = input("Search: ")
-        data = search_wallpapers(q)
+
 
 def get_wallpapers(result: Dict[str, Any], query: str) -> None:
     ownLog(result)
@@ -118,21 +120,27 @@ def get_wallpapers(result: Dict[str, Any], query: str) -> None:
     if not choice_id:
         print("Enter a proper ID")
     else:
-        downloadWallpaper(choice_id)
+        downloadWallpaper(choice_id, False)
 
-def downloadWallpaper(ID: str):
+def downloadWallpaper(ID: str, called: bool):
+    filepath = None
+
+    if args.apply and called is not True:
+        from wallpaper import applyWallpaper
+        handler = input("Chose your handler (swww): ")
+        applyWallpaper(ID, handler)
+
     try:
         url = f"https://wallhaven.cc/api/v1/w/{ID}"
 
         response = requests.get(url, timeout=10)
         response.raise_for_status()
         data = response.json()
-        image_url = data["data"]["path"]
 
+        image_url = data["data"]["path"]
         filename = image_url.split("/")[-1]
 
         os.makedirs("images", exist_ok=True)
-
         filepath = os.path.join("images", filename)
 
         image = requests.get(image_url, stream=True, timeout=15)
@@ -152,10 +160,17 @@ def downloadWallpaper(ID: str):
                 if chunk:
                     f.write(chunk)
                     bar.update(len(chunk))
+
         print(f"Downloaded: {filepath}")
+
     except requests.exceptions.RequestException as e:
         print(f"Failed to download wallpaper {ID}: {e}")
+
     return filepath
-if args.download:
-    if args.cli:
-        get_wallpapers(data, q)
+
+if __name__ == "__main__":
+    if args.download:
+        if args.cli:
+            q = input("Search: ")
+            data = search_wallpapers(q)
+            get_wallpapers(data, q)

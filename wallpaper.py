@@ -2,19 +2,15 @@ from main import downloadWallpaper
 import subprocess
 import shutil
 
-def isHyprpaper():
-    if shutil.which('hyprpaper') is not None:
-        return True
+def whichWallHandler(handler):
+    if shutil.which(handler) is not None:
+        return 1;
     else:
-        return False
+        return 0;
 
-def isSddm():
-    if shutil.which('swww') is not None:
-        return True
+def applyWallpaper(id, handler: str):
+    filepath = downloadWallpaper(id, True);
+    if whichWallHandler(handler) is not 0:
+        subprocess.run([handler, "img", filepath]);
     else:
-        return False
-
-
-def applyWallpaper(id, handler):
-    filepath = downloadWallpaper(id);
-    subprocess.run(handler, "img", filepath)
+        print(handler + "not aviable")

@@ -22,6 +22,19 @@
         <main id="main">
             <section class="download">
                 <input type="text" id="userInput" placeholder="Type something..." />
+                <details class="filters">
+                    <summary>Filters</summary>
+
+                    <div class="filters-content">
+                        <input type="text" id="apiKey" placeholder="Enter your API key">
+
+                        <select id="purity">
+                            <option value="100">SFW</option>
+                            <option value="110">Sketchy</option>
+                            <option value="111">NSFW</option>
+                        </select>
+                    </div>
+                </details>
                 <button id="sendBtn">Send to Python</button>
 
                 <div class="container" id="container"></div>
