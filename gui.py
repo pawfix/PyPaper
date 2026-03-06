@@ -16,6 +16,6 @@ class Api():
 
 api = Api()
 webview.create_window('PyPaper', '././site/index.html', js_api=api)
-webview.start(debug=True)
+webview.start()
 
 
