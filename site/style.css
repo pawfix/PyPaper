@@ -6,20 +6,19 @@
 
 body {
     overflow-x: hidden;
-    background: #0a0a0a;
+    background: #0f0f0f; /* slightly lighter than before */
     color: #e5e5e5;
     font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
 }
 
 /* HEADER */
-
 header {
     height: 56px;
     display: flex;
     align-items: center;
     justify-content: space-evenly;
-    border-bottom: 1px solid #222;
-    background: #0f0f0f;
+    border-bottom: 1px solid #333; /* slightly brighter */
+    background: #161616; /* subtle glare effect */
 }
 
 header div {
@@ -30,13 +29,14 @@ header div {
 .headBtn {
     font-size: 15px;
     font-weight: 600;
-    color: #888;
+    color: #aaa; /* brighter */
     cursor: pointer;
-    transition: color 0.2s ease, transform 0.1s ease;
+    transition: color 0.2s ease, transform 0.1s ease, text-shadow 0.2s ease;
 }
 
 .headBtn:hover {
-    color: #e5e5e5;
+    color: #fff;
+    text-shadow: 0 0 8px rgba(255,255,255,0.2); /* glare effect */
 }
 
 .headBtn:active {
@@ -44,7 +44,6 @@ header div {
 }
 
 /* MAIN SLIDER */
-
 main {
     display: flex;
     width: 300vw;
@@ -58,39 +57,36 @@ main section {
 }
 
 /* INPUTS */
-
 input {
     width: 100%;
     margin-bottom: 10px;
-
-    background: #141414;
-    border: 1px solid #262626;
+    background: #1a1a1a; /* brighter dark */
+    border: 1px solid #3a3a3a; /* soft border for glare effect */
     border-radius: 6px;
-
     padding: 10px 12px;
-
     color: #e5e5e5;
     font-size: 14px;
-
     outline: none;
-
     transition:
         border-color 0.15s ease,
         background 0.15s ease,
+        box-shadow 0.15s ease,
         transform 0.1s ease;
 }
 
 input::placeholder {
-    color: #666;
+    color: #888;
 }
 
 input:hover {
-    border-color: #333;
+    border-color: #555;
+    box-shadow: 0 0 8px rgba(255,255,255,0.05);
 }
 
 input:focus {
-    border-color: #444;
-    background: #181818;
+    border-color: #777;
+    background: #1f1f1f;
+    box-shadow: 0 0 10px rgba(255,255,255,0.08);
 }
 
 input:active {
@@ -98,31 +94,27 @@ input:active {
 }
 
 /* BUTTON */
-
 button {
     margin-top: 10px;
-
-    background: #141414;
-    border: 1px solid #262626;
+    background: #1a1a1a;
+    border: 1px solid #3a3a3a;
     border-radius: 6px;
-
     padding: 10px 14px;
-
     color: #e5e5e5;
     font-size: 14px;
     font-weight: 600;
-
     cursor: pointer;
-
     transition:
         background 0.15s ease,
         border-color 0.15s ease,
+        box-shadow 0.15s ease,
         transform 0.1s ease;
 }
 
 button:hover {
-    background: #181818;
-    border-color: #333;
+    background: #1f1f1f;
+    border-color: #555;
+    box-shadow: 0 0 12px rgba(255,255,255,0.05);
 }
 
 button:active {
@@ -130,45 +122,39 @@ button:active {
 }
 
 /* SELECT */
-
 select {
     width: 100%;
-
-    background: #141414;
-    border: 1px solid #262626;
+    background: #1a1a1a;
+    border: 1px solid #3a3a3a;
     border-radius: 6px;
-
     padding: 10px 36px 10px 12px;
-
     color: #e5e5e5;
     font-size: 14px;
     font-family: inherit;
-
     outline: none;
     cursor: pointer;
-
     appearance: none;
-
     background-image:
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
-
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23aaa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 10px center;
     background-size: 14px;
-
     transition:
         border-color 0.15s ease,
         background 0.15s ease,
+        box-shadow 0.15s ease,
         transform 0.1s ease;
 }
 
 select:hover {
-    border-color: #333;
+    border-color: #555;
+    box-shadow: 0 0 8px rgba(255,255,255,0.05);
 }
 
 select:focus {
-    border-color: #444;
-    background: #181818;
+    border-color: #777;
+    background: #1f1f1f;
+    box-shadow: 0 0 10px rgba(255,255,255,0.08);
 }
 
 select:active {
@@ -176,20 +162,17 @@ select:active {
 }
 
 option {
-    background: #141414;
+    background: #1a1a1a;
     color: #e5e5e5;
 }
 
 /* FILTERS */
-
 .filters {
     width: 90%;
     margin: 10px auto;
-
-    border: 1px solid #222;
+    border: 1px solid #333;
     border-radius: 10px;
-
-    background: #0f0f0f;
+    background: #161616; /* brighter for glare */
     overflow: hidden;
 }
 
@@ -208,7 +191,7 @@ option {
 .filters summary::after {
     content: "▾";
     float: right;
-    color: #777;
+    color: #aaa;
     transition: transform 0.25s ease;
 }
 
@@ -220,11 +203,9 @@ option {
     display: flex;
     flex-direction: column;
     gap: 12px;
-
     padding: 0 16px;
     max-height: 0;
     opacity: 0;
-
     transition:
         max-height 0.35s ease,
         opacity 0.25s ease,
@@ -238,29 +219,23 @@ option {
 }
 
 /* WALLPAPER GRID */
-
 .container {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
     gap: 20px;
-
     margin-top: 25px;
 }
 
 /* CARD */
-
 .card {
     display: flex;
     flex-direction: column;
-
-    background: #111;
-    border: 1px solid #222;
+    background: #171717; /* slightly brighter for glare */
+    border: 1px solid #333;
     border-radius: 10px;
-
     overflow: hidden;
     cursor: pointer;
-    position: relative; /* for ripple effect */
-
+    position: relative;
     transition:
         transform 0.2s ease,
         border-color 0.2s ease,
@@ -269,20 +244,20 @@ option {
 
 .card:hover {
     transform: translateY(-4px);
-    border-color: #333;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.45);
+    border-color: #555;
+    box-shadow: 0 6px 20px rgba(255,255,255,0.05); /* subtle glare */
 }
 
 .card:active {
     transform: translateY(-1px) scale(0.96);
-    box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    box-shadow: 0 2px 6px rgba(255,255,255,0.08);
 }
 
 .card::after {
     content: "";
     position: absolute;
     inset: 0;
-    background: rgba(255,255,255,0.06);
+    background: rgba(255,255,255,0.08); /* slightly stronger flash */
     opacity: 0;
     transition: opacity 0.2s ease;
 }
@@ -300,6 +275,6 @@ option {
 .card h1 {
     font-size: 13px;
     padding: 10px;
-    color: #aaa;
+    color: #ccc; /* slightly brighter for glare */
     word-break: break-all;
 }
