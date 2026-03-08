@@ -8,43 +8,39 @@
     <body>
 
         <header>
-            <div>
-                <h3 class="headBtn" id="download">Download</h3>
+            <div class="headBtn" id="download">
+                <h3>Download</h3>
             </div>
-            <div>
-                <h3 class="headBtn" id="local">Local</h3>
-            </div>
-            <div>
-                <h3 class="headBtn" id="settings">Settings</h3>
+            <div class="headBtn" id="local">
+                <h3>Local</h3>
             </div>
         </header>
 
         <main id="main">
             <section class="download">
                 <input type="text" id="userInput" placeholder="Type something..." />
-                <details class="filters">
-                    <summary>Filters</summary>
+                <div class="controls">
+                    <details class="filters">
+                        <summary>Filters</summary>
 
-                    <div class="filters-content">
-                        <input type="text" id="apiKey" placeholder="Enter your API key">
+                        <div class="filters-content">
+                            <input type="text" id="apiKey" placeholder="Enter your API key">
 
-                        <select id="purity">
-                            <option value="100">SFW</option>
-                            <option value="110">Sketchy</option>
-                            <option value="111">NSFW</option>
-                        </select>
-                    </div>
-                </details>
-                <button id="sendBtn">Send to Python</button>
+                            <select id="purity">
+                                <option value="100">SFW</option>
+                                <option value="110">Sketchy</option>
+                                <option value="111">NSFW</option>
+                            </select>
+                        </div>
+                    </details>
+                    <button id="sendBtn">Send to Python</button>
+                </div>
 
                 <div class="container" id="container"></div>
             </section>
 
             <section class="local">
                 <p>local</p>
-            </section>
-            <section class="settings">
-                <p>settings</p>
             </section>
         </main>
 

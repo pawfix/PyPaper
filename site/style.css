@@ -22,25 +22,35 @@ header {
 }
 
 header div {
-    width: 30%;
+    width: 45%;
     text-align: center;
+    height: 90%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
 }
-
-.headBtn {
+header h3 {
     font-size: 15px;
     font-weight: 600;
     color: #aaa; /* brighter */
     cursor: pointer;
     transition: color 0.2s ease, transform 0.1s ease, text-shadow 0.2s ease;
+    margin: 0;
 }
 
-.headBtn:hover {
+header h3:hover {
     color: #fff;
     text-shadow: 0 0 8px rgba(255,255,255,0.2); /* glare effect */
 }
 
-.headBtn:active {
+header h3:active {
     transform: scale(0.95);
+}
+
+header div.active h3 {
+    color: #fff;
+    text-shadow: 0 0 8px rgba(255,255,255,0.2); 
 }
 
 /* MAIN SLIDER */
@@ -93,9 +103,27 @@ input:active {
     transform: scale(0.99);
 }
 
+/* CONTROLS CONTAINER */
+.controls {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    align-items: flex-start;
+}
+
+.controls .filters {
+    flex: 1;
+    margin: 0;
+}
+
+.controls button {
+    flex-shrink: 0;
+    white-space: nowrap;
+    margin: 0;
+}
+
 /* BUTTON */
 button {
-    margin-top: 10px;
     background: #1a1a1a;
     border: 1px solid #3a3a3a;
     border-radius: 6px;
@@ -168,7 +196,7 @@ option {
 
 /* FILTERS */
 .filters {
-    width: 90%;
+    width: 100%;
     margin: 10px auto;
     border: 1px solid #333;
     border-radius: 10px;
@@ -230,36 +258,41 @@ option {
 .card {
     display: flex;
     flex-direction: column;
-    background: #171717; /* slightly brighter for glare */
-    border: 1px solid #333;
-    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.1); /* semi-transparent for glass effect */
+    backdrop-filter: blur(10px); /* blur background for glassmorphism */
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 15px;
     overflow: hidden;
     cursor: pointer;
     position: relative;
     transition:
-        transform 0.2s ease,
-        border-color 0.2s ease,
-        box-shadow 0.2s ease;
+        transform 0.3s ease,
+        border-color 0.3s ease,
+        box-shadow 0.3s ease,
+        backdrop-filter 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
 .card:hover {
-    transform: translateY(-4px);
-    border-color: #555;
-    box-shadow: 0 6px 20px rgba(255,255,255,0.05); /* subtle glare */
+    transform: translateY(-8px) scale(1.02);
+    border-color: rgba(255, 255, 255, 0.4);
+    box-shadow: 0 8px 30px rgba(255, 255, 255, 0.1), 0 0 20px rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(15px);
 }
 
 .card:active {
-    transform: translateY(-1px) scale(0.96);
-    box-shadow: 0 2px 6px rgba(255,255,255,0.08);
+    transform: translateY(-2px) scale(0.98);
+    box-shadow: 0 4px 10px rgba(255, 255, 255, 0.15);
 }
 
 .card::after {
     content: "";
     position: absolute;
     inset: 0;
-    background: rgba(255,255,255,0.08); /* slightly stronger flash */
+    background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
     opacity: 0;
-    transition: opacity 0.2s ease;
+    transition: opacity 0.3s ease;
+    border-radius: 15px;
 }
 
 .card:active::after {

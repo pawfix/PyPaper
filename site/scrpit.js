@@ -104,9 +104,6 @@ header.addEventListener('click', function (event) {
             main.style.transform = 'translateX(-100vw)'
             break
 
-        case 'settings':
-            main.style.transform = 'translateX(-200vw)'
-            break
     }
 })
 
