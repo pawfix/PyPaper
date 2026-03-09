@@ -133,6 +133,8 @@ def downloadWallpaper(ID: str, called: bool, save_dir: str = None):
     if save_dir is None:
         save_dir = args.save_dir
 
+    save_dir = os.path.expanduser(save_dir)
+
     # Check if save_dir is writable
     if not os.path.exists(save_dir):
         try:
