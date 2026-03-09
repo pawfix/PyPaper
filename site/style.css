@@ -258,8 +258,7 @@ option {
 .card {
     display: flex;
     flex-direction: column;
-    background: rgba(255, 255, 255, 0.1); /* semi-transparent for glass effect */
-    backdrop-filter: blur(10px); /* blur background for glassmorphism */
+    background: rgba(255, 255, 255, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 15px;
     overflow: hidden;
@@ -277,7 +276,6 @@ option {
     transform: translateY(-8px) scale(1.02);
     border-color: rgba(255, 255, 255, 0.4);
     box-shadow: 0 8px 30px rgba(255, 255, 255, 0.1), 0 0 20px rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(15px);
 }
 
 .card:active {
@@ -308,6 +306,6 @@ option {
 .card h1 {
     font-size: 13px;
     padding: 10px;
-    color: #ccc; /* slightly brighter for glare */
+    color: #ccc; 
     word-break: break-all;
 }
