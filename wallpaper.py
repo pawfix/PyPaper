@@ -8,8 +8,8 @@ def whichWallHandler(handler):
     else:
         return 0;
 
-def applyWallpaper(id, handler: str):
-    filepath = downloadWallpaper(id, True);
+def applyWallpaper(id, handler: str, save_dir: str = None):
+    filepath = downloadWallpaper(id, True, save_dir);
     if whichWallHandler(handler) is not 0:
         subprocess.run([handler, "img", filepath]);
     else:

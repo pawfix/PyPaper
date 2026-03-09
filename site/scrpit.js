@@ -19,7 +19,8 @@ function loadWallpaper(id, thumbnail) {
 
     // Add click listener to log id
     card.addEventListener('click', () => {
-        window.pywebview.api.setWallpaper(card.id);
+        const saveDir = document.getElementById('saveDir').value || './images';
+        window.pywebview.api.setWallpaper(card.id, saveDir);
     });
 
     container.appendChild(card);

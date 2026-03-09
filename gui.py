@@ -7,12 +7,12 @@ class Api():
     def getData(self, user_input, key, purity):
         data = search_wallpapers(user_input, key, purity)
         """Python function that takes input from JS"""
-        print(f"Python received input: {user_input}")
+        ownLog(f"Python received input: {user_input}")
         # Example: return some processed data
         return data
-    def setWallpaper(self, id):
-        print(id),
-        applyWallpaper(id, "swww")
+    def setWallpaper(self, id, save_dir):
+        ownLog(f"Setting wallpaper: {id}")
+        applyWallpaper(id, "swww", save_dir)
 
 api = Api()
 webview.create_window('PyPaper', '././site/index.html', js_api=api)

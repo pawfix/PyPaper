@@ -47,6 +47,13 @@ parser.add_argument(
         help="Apply the wallpaper after download",
         action="store_true")
 
+# Argument -s to specify save directory
+parser.add_argument(
+        "-s",
+        "--save-dir",
+        help="Directory to save wallpapers (default: ./images)",
+        default="./images")
+
 args = parser.parse_args()
 
 if not args.cli:
@@ -122,7 +129,21 @@ def get_wallpapers(result: Dict[str, Any], query: str) -> None:
     else:
         downloadWallpaper(choice_id, False)
 
-def downloadWallpaper(ID: str, called: bool):
+def downloadWallpaper(ID: str, called: bool, save_dir: str = None):
+    if save_dir is None:
+        save_dir = args.save_dir
+
+    # Check if save_dir is writable
+    if not os.path.exists(save_dir):
+        try:
+            os.makedirs(save_dir, exist_ok=True)
+        except OSError as e:
+            print(f"Failed to create directory {save_dir}: {e}")
+            return None
+    if not os.access(save_dir, os.W_OK):
+        print(f"Directory {save_dir} is not writable")
+        return None
+
     filepath = None
 
     if args.apply and called is not True:
@@ -140,8 +161,8 @@ def downloadWallpaper(ID: str, called: bool):
         image_url = data["data"]["path"]
         filename = image_url.split("/")[-1]
 
-        os.makedirs("images", exist_ok=True)
-        filepath = os.path.join("images", filename)
+        os.makedirs(save_dir, exist_ok=True)
+        filepath = os.path.join(save_dir, filename)
 
         image = requests.get(image_url, stream=True, timeout=15)
         image.raise_for_status()
