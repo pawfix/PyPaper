@@ -33,6 +33,13 @@
                                 <option value="110">Sketchy</option>
                                 <option value="111">NSFW</option>
                             </select>
+                            <select name="handler" id="handler">
+                                <option value="swww">SWWW</option>
+                                <option value="awww">AWWW</option>
+                                <option value="swaybg">swaybg</option>
+                                <option value="hyprpaper">hyprpaper</option>
+                                <option value="wpaperd"></option>
+                            </select>
                         </div>
                     </details>
                     <button id="sendBtn">Send to Python</button>
@@ -42,7 +49,9 @@
             </section>
 
             <section class="local">
-                <p>local</p>
+                <input type="text" name="fileDir" id="localFileDir" placeholder="Enter your wallpaper dir (default: ./images)" value="./images">
+                <button id="localFileBtn">Get local wallpapers</button>
+                <div class="container" id="localContainer"></div>
             </section>
         </main>
 
