@@ -1,4 +1,3 @@
-````markdown
 # PyPaper
 
 A lightweight Python wallpaper manager with a simple API and desktop UI.
@@ -140,7 +139,6 @@ PyPaper/
 ├── assets/              # Static files
 ├── requirements.txt     # Python dependencies
 └── README.md
-```
 
 *(structure may evolve as the project grows)*
 
