@@ -1,3 +1,5 @@
+/dist
+/build
 /__pycache__
 /argparse-1.4.0.dist-info
 /bin
