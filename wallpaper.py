@@ -18,7 +18,12 @@ def runHandler(handler, filepath):
                 subprocess.run(["awww", "img", filepath]);
 
             case 'hyprpaper':
-                subprocess.run(["hyprctl", handler, "wallpaper", "' ,", filepath, "[ ] '"])
+                subprocess.run([
+                    "hyprctl",
+                    "hyprpaper",
+                    "wallpaper",
+                    f", {filepath} , [ ]"
+                ])
 
             case 'wpaperd':
                 subprocess.run(["wpaperdctl", "set", filepath])
@@ -29,7 +34,8 @@ def runHandler(handler, filepath):
             case _:
                 print("Handler not supported")
     except:
-        print("couldnt set wallpaper, maybe daemon isn't running?: ", e)
+        print("hyprctl hyprpaper wallpaper ',", filepath, ", [ ]'")
+        print("couldnt set wallpaper, maybe daemon isn't running?: ", handler, filepath)
 
 def applyWallpaper(id, handler: str, save_dir: str = None):
     filepath = downloadWallpaper(id, True, save_dir);
