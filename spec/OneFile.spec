@@ -2,10 +2,10 @@
 
 
 a = Analysis(
-    ['main.py'],
+    ['../main.py'],
     pathex=[],
     binaries=[],
-    datas=[('site', 'site')],
+    datas=[('../site/','site')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},

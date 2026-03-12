@@ -18,7 +18,7 @@ def runHandler(handler, filepath):
                 subprocess.run(["awww", "img", filepath]);
 
             case 'hyprpaper':
-                subprocess.run(["hyprctl", handler, "wallpaper", "[], [{filepath}], []"])
+                subprocess.run(["hyprctl", handler, "wallpaper", "' ,", filepath, "[ ] '")
 
             case 'wpaperd':
                 subprocess.run(["wpaperdctl", "set", filepath])
