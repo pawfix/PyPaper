@@ -70,8 +70,8 @@ main section {
 input {
     width: 100%;
     margin-bottom: 10px;
-    background: #1a1a1a; /* brighter dark */
-    border: 1px solid #3a3a3a; /* soft border for glare effect */
+    background: #1a1a1a;
+    border: 1px solid #3a3a3a;
     border-radius: 6px;
     padding: 10px 12px;
     color: #e5e5e5;
@@ -121,7 +121,49 @@ input:active {
     white-space: nowrap;
     margin: 0;
 }
+label#rememberLabel {
+    background: #1a1a1a;
+    border: 1px solid #3a3a3a;
+    border-radius: 6px;
+    padding: 10px 12px;
+    font-size: 18px;
+    font-family: inherit;
+    outline: none;
+    cursor: pointer;
+    appearance: none;
+    margin-bottom: 10px;
+}
+label input {
+    width: auto;
+}
+input[type="checkbox"] {
+    appearance: checkbox;
+    cursor: pointer;
+    accent-color: #e5e5e5;
+    background-color: #1a1a1a;
+    border: 1.5px solid #3a3a3a;
+    border-radius: 4px;
+    transition:
+            background 0.2s ease,
+            border-color 0.2s ease,
+            box-shadow 0.2s ease,
+            transform 0.1s ease;
+}
 
+input[type="checkbox"]:hover {
+    border-color: #555;
+    box-shadow: 0 0 6px rgba(255,255,255,0.05);
+}
+
+input[type="checkbox"]:focus {
+    outline: none;
+    border-color: #777;
+    box-shadow: 0 0 8px rgba(255,255,255,0.1);
+}
+
+input[type="checkbox"]:active {
+    transform: scale(0.95);
+}
 /* BUTTON */
 button {
     background: #1a1a1a;

@@ -2,6 +2,45 @@ let recivedData;
 const container = document.getElementById("container")
 const localContainer = document.getElementById('localContainer');
 const base64srcPathMap = {};
+const remember = document.getElementById('remember');
+getReceivedData();
+
+// Load saved values from localStorage into input fields
+function getReceivedData() {
+    const apiInput = document.getElementById('apiKey');
+    const saveDirInput = document.getElementById('saveDir');
+    const purityInput = document.getElementById('purity');
+    const handlerInput = document.getElementById('handler');
+
+    // Get saved values from localStorage
+    const api = localStorage.getItem('api');
+    const saveDir = localStorage.getItem('saveDir');
+    const purity = localStorage.getItem('purity');
+    const handler = localStorage.getItem('handler');
+
+    // Set input values if they exist
+    if (api) apiInput.value = api;
+    if (saveDir) saveDirInput.value = saveDir;
+    if (purity) purityInput.value = purity;
+    if (handler) handlerInput.value = handler;
+}
+
+// Save user choices to localStorage
+function rememberUserChoices() {
+    const api = document.getElementById('apiKey').value;
+    const saveDir = document.getElementById('saveDir').value;
+    const purity = document.getElementById('purity').value;
+    const handler = document.getElementById('handler').value;
+    const remember = document.getElementById('remember'); // checkbox for "remember me"
+
+    if (remember.checked) {
+        localStorage.setItem('api', api);
+        localStorage.setItem('saveDir', saveDir);
+        localStorage.setItem('purity', purity);
+        localStorage.setItem('handler', handler);
+        console.log("Saved user choices");
+    }
+}
 
 function loadWallpaper(id, thumbnail) {
     // Create the card element instead of using innerHTML string
@@ -176,6 +215,7 @@ window.addEventListener('pywebviewready', function () {
         const purity = document.getElementById("purity").value
 
         getData(input, api, purity);
+        rememberUserChoices();
     });
 
     // Local part
