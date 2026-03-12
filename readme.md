@@ -1,214 +1,234 @@
-````markdown
 # PyPaper
 
-A lightweight Python wallpaper manager with a simple API and desktop UI.
+A small Python utility for downloading and applying wallpapers programmatically.
 
-## Overview
+![GitHub stars](https://img.shields.io/github/stars/pawfix/PyPaper?style=flat)
+![GitHub license](https://img.shields.io/github/license/pawfix/PyPaper)
+![Python](https://img.shields.io/badge/python-3.x-blue)
+![GitHub issues](https://img.shields.io/github/issues/pawfix/PyPaper)
+![GitHub last commit](https://img.shields.io/github/last-commit/pawfix/PyPaper)
+![Repo size](https://img.shields.io/github/repo-size/pawfix/PyPaper)
 
-PyPaper is a small utility for browsing, downloading, and applying wallpapers directly from Python.  
-It was originally built as a personal project to simplify wallpaper management on Linux systems, especially in environments where standard desktop tools don’t work well (tiling WMs, minimal setups, etc.).
+---
 
-The project combines a small Python backend with a lightweight UI layer to fetch wallpapers, preview them, download them locally, and apply them using system wallpaper handlers.
+# Table of Contents
 
-The goal of PyPaper is to stay simple, hackable, and easy to extend.
+- [Overview](#overview)
+- [Features](#features)
+- [Installation](#installation)
+  - [Requirements](#requirements)
+  - [Install from source](#install-from-source)
+- [Usage](#usage)
+- [Configuration](#configuration)
+- [Project Structure](#project-structure)
+- [Architecture](#architecture)
+- [Development](#development)
+- [Roadmap](#roadmap)
+- [Contributing](#contributing)
+- [License](#license)
 
-## Features
+---
 
-- Fetch wallpaper metadata from a remote source
-- Download wallpapers locally
-- Apply wallpapers through configurable handlers
-- Simple API interface for UI → backend communication
-- Lightweight desktop interface built with `pywebview`
-- Custom wallpaper save directory
-- Runtime wallpaper application via system commands
-- Basic handler detection (checks if a wallpaper backend exists)
-- Modular Python structure designed to be easy to modify
+# Overview
 
-## Screenshots / Demo
+PyPaper is a lightweight Python tool for working with wallpapers programmatically.
 
-*(Add screenshots here once available)*
+It focuses on a simple workflow:
 
-Examples could include:
+1. Fetch or download wallpapers
+2. Store them locally
+3. Apply them using a system wallpaper handler
 
-- Wallpaper browsing interface
-- Downloaded wallpaper preview
-- Applying wallpaper through the UI
+The project exists mainly as a scripting-friendly alternative to GUI wallpaper managers. It allows developers to integrate wallpaper downloading and switching directly into Python scripts, CLI tools, or automation setups.
 
-## Installation
+Typical use cases include:
 
-### Requirements
+- automation scripts
+- desktop customization setups
+- integration with tiling window managers
+- programmatic wallpaper switching
+- building custom wallpaper tools
 
-- Python 3.10+
-- A wallpaper backend installed on your system (example: `swww`, `feh`, etc.)
+The codebase is intentionally small and easy to extend.
 
-### Clone the repository
+---
 
-```bash
-git clone https://github.com/pawfix/PyPaper.git
-cd PyPaper
-````
+# Features
 
-### Create a virtual environment
+- Download wallpapers programmatically
+- Optional saving to a custom directory
+- Automatic wallpaper application
+- Support for external wallpaper handlers
+- Simple Python API
+- Script-friendly design
+- Minimal dependencies
+- Designed for Linux desktop environments
 
-```bash
-python -m venv .venv
-source .venv/bin/activate
-```
+---
 
-### Install dependencies
+# Installation
 
-```bash
-pip install -r requirements.txt
-```
+## Requirements
 
-If the project uses `pyproject.toml`:
-
-```bash
-pip install .
-```
-
-## Usage
-
-Run the main application:
-
-```bash
-python main.py
-```
-
-This will launch the PyPaper UI.
-
-### Example: Applying a wallpaper programmatically
-
-```python
-from main import applyWallpaper
-
-applyWallpaper(
-    id="wallpaper_id",
-    handler="swww",
-    save_dir="~/Pictures/wallpapers"
-)
-```
-
-### Example: Downloading a wallpaper
-
-```python
-from main import downloadWallpaper
-
-downloadWallpaper("wallpaper_id")
-```
-
-## Configuration
-
-Some behavior can be controlled through parameters in the API functions.
-
-### Wallpaper handler
-
-The handler is the program responsible for actually setting the wallpaper.
-
-Examples:
+- Python 3.8+
+- Linux (tested primarily on Linux desktop environments)
+- A supported wallpaper handler such as:
 
 ```
 swww
-feh
-nitrogen
+awww
+hyprpaper
 ```
 
-Example call:
+---
 
-```python
-applyWallpaper("12345", "swww")
-```
+## Install from source
 
-### Save directory
-
-You can optionally specify where downloaded wallpapers should be stored:
-
-```python
-applyWallpaper("12345", "swww", "~/Pictures/wallpapers")
-```
-
-If not provided, PyPaper will use its default storage location.
-
-## Project Structure
-
-```
-PyPaper/
-├── main.py              # Entry point for the application
-├── api/                 # Backend API used by the UI
-├── ui/                  # Frontend assets used by pywebview
-├── utils/               # Helper utilities
-├── assets/              # Static files
-├── requirements.txt     # Python dependencies
-└── README.md
-```
-
-*(structure may evolve as the project grows)*
-
-## Dependencies
-
-Main libraries used:
-
-* `pywebview` – lightweight UI layer
-* `requests` – downloading wallpaper data
-* `json` – API data handling
-* `subprocess` – executing wallpaper handlers
-* `shutil` – handler detection
-
-System dependencies depend on your wallpaper backend (for example `swww`).
-
-## Development
-
-To run PyPaper in development mode:
+Clone the repository:
 
 ```bash
-git clone https://github.com/pawfix/PyPaper.git
+git clone https://github.com/pawfix/PyPaper
 cd PyPaper
+```
+
+Install dependencies:
+
+Install PyWebView deps for your distro
+
+```bash
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
+```
+
+Or run one of scripts
+
+Run the tool:
+
+```bash
 python main.py
 ```
 
-### Packaging (optional)
+---
 
-If you want to build a standalone binary:
+# Usage
 
-```bash
-pyinstaller PyPaper.spec
+## Download a wallpaper
+
+Run the GUI:
+
+``` bash
+python main.py
 ```
 
-## Roadmap
+Or CLI:
+``` bash
+python main.py -cd
+```
 
-Potential improvements planned for the project:
+# Project Structure
 
-* Wallpaper source plugins
-* Local wallpaper collections
-* Wallpaper history
-* Automatic wallpaper rotation
-* Multi-monitor support
-* Better UI browsing experience
-* Cross-platform support
+```
+PyPaper/
+│
+├── main.py
+├── wallpaper.py
+├── utils.py
+├── requirements.txt
+└── README.md
+```
 
-## Contributing
+### Key Components
+
+**main.py**
+
+Entry point for wallpaper downloading logic.
+
+Responsible for:
+
+- retrieving wallpapers
+- saving them locally
+- returning file paths
+
+---
+
+**wallpaper.py**
+
+Handles applying wallpapers using system commands.
+
+Functions include:
+
+- handler detection
+- command execution
+- wallpaper switching
+
+---
+
+
+# Development
+
+To work on the project locally:
+
+```bash
+git clone https://github.com/pawfix/PyPaper
+cd PyPaper
+```
+
+Create a virtual environment:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+```
+
+Install dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+Run the project:
+
+```bash
+python main.py
+```
+
+---
+
+# Roadmap
+
+Planned improvements:
+
+- provider plugins
+- caching system
+- better handler detection
+- image metadata support
+
+---
+
+# Contributing
 
 Contributions are welcome.
 
-If you'd like to help:
+Basic workflow:
 
 1. Fork the repository
 2. Create a feature branch
+
+```bash
+git checkout -b feature/my-feature
+```
+
 3. Commit your changes
-4. Open a pull request
+4. Push the branch
+5. Open a Pull Request
 
-Bug reports, feature suggestions, and improvements are always appreciated.
+Suggestions, bug reports, and improvements are always appreciated.
 
-## License
+---
+
+# License
 
 This project is licensed under the MIT License.
 
 See the `LICENSE` file for details.
-
-```
-::contentReference[oaicite:0]{index=0}
-```
-
