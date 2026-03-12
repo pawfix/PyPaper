@@ -1,5 +1,7 @@
 #!/bin/bash
 
+cd ..
+
 # Function to install system dependencies
 install_system_deps() {
     if [[ "$OSTYPE" == "linux-gnu"* ]]; then
@@ -8,19 +10,19 @@ install_system_deps() {
             case $ID in
                 arch)
                     echo "Detected Arch Linux. Installing dependencies..."
-                    sudo pacman -S --needed webkit2gtk python-gobject swww viu kitty python
+                    sudo pacman -S --needed webkit2gtk python-gobject python
                     ;;
                 ubuntu|debian)
                     echo "Detected $ID. Installing dependencies..."
                     sudo apt update
-                    sudo apt install -y libwebkit2gtk-4.0-dev python3-gi swww viu kitty python3 python3-pip
+                    sudo apt install -y libwebkit2gtk-4.0-dev python3-gi python3 python3-pip
                     ;;
                 fedora)
                     echo "Detected Fedora. Installing dependencies..."
-                    sudo dnf install -y webkit2gtk3 python3-gobject swww viu kitty python3 python3-pip
+                    sudo dnf install -y webkit2gtk3 python3-gobject python3 python3-pip
                     ;;
                 *)
-                    echo "Unsupported distro: $ID. Please install dependencies manually: GTK, WebKitGTK, swww, viu, kitty, python3, pip"
+                    echo "Unsupported distro: $ID. Please install dependencies manually: GTK, WebKitGTK,python3, pip, supported Terminal and supported Wallpaper Util"
                     ;;
             esac
         else
@@ -30,7 +32,7 @@ install_system_deps() {
         echo "Detected macOS. Installing dependencies..."
         # macOS might need brew
         if command -v brew &> /dev/null; then
-            brew install python3 gtk+3 webkit2gtk swww viu kitty
+            brew install python3 gtk+3 webkit2gtk
         else
             echo "Homebrew not found. Please install Homebrew and dependencies manually."
         fi

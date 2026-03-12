@@ -106,7 +106,6 @@ function displayFileData(json) {
 
 
 async function getData(input, api, purity) {
-    let recivedData;
     try {
         // Call Python method with input
         recivedData = await window.pywebview.api.getData(input, api, purity);
