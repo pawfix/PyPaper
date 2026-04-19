@@ -67,6 +67,10 @@ function updateDownloadButtons() {
         const applyBtn = document.createElement('button');
         applyBtn.textContent = 'Download & Apply';
         applyBtn.addEventListener('click', async () => {
+            if (!window.pywebview || !window.pywebview.api) {
+                console.error('PyWebView API not available for download & apply');
+                return;
+            }
             const id = Array.from(selectedDownloads)[0];
             await window.pywebview.api.setWallpaper(id, saveDir, handler);
             selectedDownloads.clear();
@@ -79,6 +83,10 @@ function updateDownloadButtons() {
         const downloadBtn = document.createElement('button');
         downloadBtn.textContent = `Download (${selectedDownloads.size})`;
         downloadBtn.addEventListener('click', async () => {
+            if (!window.pywebview || !window.pywebview.api) {
+                console.error('PyWebView API not available for download');
+                return;
+            }
             for (const id of selectedDownloads) {
                 await window.pywebview.api.downloadWallpaper(id, saveDir);
             }
@@ -105,6 +113,10 @@ function updateLocalButtons() {
         const applyBtn = document.createElement('button');
         applyBtn.textContent = 'Apply';
         applyBtn.addEventListener('click', async () => {
+            if (!window.pywebview || !window.pywebview.api) {
+                console.error('PyWebView API not available for local apply');
+                return;
+            }
             const name = Array.from(selectedLocal)[0];
             const filePath = base64srcPathMap[name];
             await window.pywebview.api.applyLocalWallpaper(filePath, handler);
@@ -220,15 +232,23 @@ function displayFileData(json) {
 }
 
 async function getData(input, api, purity) {
+    console.log('getData called with:', { input, api, purity });
+
+    if (!window.pywebview || !window.pywebview.api) {
+        console.error('PyWebView API not available!');
+        displayDataError('PyWebView API not available. Please restart the application.');
+        return;
+    }
+
     try {
         // Call Python method with input
+        console.log('Calling window.pywebview.api.getData...');
         recivedData = await window.pywebview.api.getData(input, api, purity);
-
-        // Show raw response
         console.log("Python response:", recivedData);
 
     } catch (err) {
         console.error("Error calling Python:", err);
+        displayDataError('Failed to communicate with Python backend: ' + err.message);
         return;
     }
 
@@ -254,15 +274,25 @@ async function getData(input, api, purity) {
 }
 
 async function getFiles(dir) {
+    console.log('getFiles called with:', dir);
+
+    if (!window.pywebview || !window.pywebview.api) {
+        console.error('PyWebView API not available!');
+        displayFileDataError('PyWebView API not available. Please restart the application.');
+        return;
+    }
+
     let localFiles;
     try {
+        console.log('Calling window.pywebview.api.getFiles...');
         localFiles = await window.pywebview.api.getFiles(dir);
+        console.log('Local files response:', localFiles);
         if (typeof localFiles === "string") {
             localFiles = JSON.parse(localFiles);
         }
     } catch (e) {
         console.warn("Didn't receive data", e);
-        displayFileDataError("Failed to get local files");
+        displayFileDataError("Failed to get local files: " + e.message);
         return;
     }
 
@@ -281,72 +311,83 @@ async function getFiles(dir) {
 // Ensure pywebview API is ready
 window.addEventListener('pywebviewready', function () {
     console.log('PyWebView is ready!');
-
-    // Download part
-    const sendBtn = document.getElementById('sendBtn');
-    console.log('Send button found:', sendBtn);
-
-    sendBtn.addEventListener('click', async function () {
-        console.log('Send button clicked!');
-        const currentData = {
-            input: document.getElementById('userInput').value,
-            api: document.getElementById('apiKey').value,
-            purity: document.getElementById('purity').value
-        };
-
-        if (
-            lastSelectedData &&
-            currentData.input === lastSelectedData.input &&
-            currentData.api === lastSelectedData.api &&
-            currentData.purity === lastSelectedData.purity
-        ) {
-            return;
-        }
-
-        lastSelectedData = currentData;
-
-        getData(currentData.input, currentData.api, currentData.purity);
-        rememberUserChoices();
-    });
-
-    // Local part
-    const localBtn = document.getElementById('localFileBtn');
-    console.log('Local button found:', localBtn);
-
-    localBtn.addEventListener('click', async function () {
-        console.log('Local button clicked!');
-        const localFileDir = document.getElementById('localFileDir').value
-
-        getFiles(localFileDir)
-    })
-
 });
 
-// Header navigation - moved outside pywebviewready
-const main = document.getElementById('main')
-const header = document.querySelector('header')
+// Attach event listeners when DOM is loaded
+document.addEventListener('DOMContentLoaded', function () {
+    console.log('DOM loaded, attaching event listeners');
 
-header.addEventListener('click', function (event) {
-    console.log('Header clicked, target:', event.target);
-    const target = event.target.closest('.headBtn')
-    console.log('Closest headBtn:', target);
+    // Download button
+    const sendBtn = document.getElementById('sendBtn');
+    if (sendBtn) {
+        console.log('Send button found, attaching listener');
+        sendBtn.addEventListener('click', async function () {
+            console.log('Send button clicked!');
+            const currentData = {
+                input: document.getElementById('userInput').value,
+                api: document.getElementById('apiKey').value,
+                purity: document.getElementById('purity').value
+            };
 
-    if (!target) return
+            if (
+                lastSelectedData &&
+                currentData.input === lastSelectedData.input &&
+                currentData.api === lastSelectedData.api &&
+                currentData.purity === lastSelectedData.purity
+            ) {
+                return;
+            }
 
-    switch (target.id) {
+            lastSelectedData = currentData;
 
-        case 'download':
-            console.log('Switching to download tab');
-            main.style.transform = 'translateX(0vw)'
-            break
-
-        case 'local':
-            console.log('Switching to local tab');
-            main.style.transform = 'translateX(-100vw)'
-            break
-
+            getData(currentData.input, currentData.api, currentData.purity);
+            rememberUserChoices();
+        });
+    } else {
+        console.error('Send button not found!');
     }
-})
+
+    // Local button
+    const localBtn = document.getElementById('localFileBtn');
+    if (localBtn) {
+        console.log('Local button found, attaching listener');
+        localBtn.addEventListener('click', async function () {
+            console.log('Local button clicked!');
+            const localFileDir = document.getElementById('localFileDir').value;
+            getFiles(localFileDir);
+        });
+    } else {
+        console.error('Local button not found!');
+    }
+
+    // Header navigation
+    const main = document.getElementById('main');
+    const header = document.querySelector('header');
+
+    if (header) {
+        console.log('Header found, attaching navigation listener');
+        header.addEventListener('click', function (event) {
+            console.log('Header clicked, target:', event.target);
+            const target = event.target.closest('.headBtn') || event.target.closest('h3')?.parentElement;
+            console.log('Closest headBtn:', target);
+
+            if (!target || !target.classList.contains('headBtn')) return;
+
+            switch (target.id) {
+                case 'download':
+                    console.log('Switching to download tab');
+                    main.style.transform = 'translateX(0vw)';
+                    break;
+                case 'local':
+                    console.log('Switching to local tab');
+                    main.style.transform = 'translateX(-100vw)';
+                    break;
+            }
+        });
+    } else {
+        console.error('Header not found!');
+    }
+});
 
 
 

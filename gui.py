@@ -43,7 +43,7 @@ class Api():
         runHandler(handler, filepath)
 
 api = Api()
-webview.create_window('PyPaper', '././site/index.html', js_api=api)
+webview.create_window('PyPaper', 'site/index.html', js_api=api)
 webview.start()
 
 
