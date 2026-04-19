@@ -77,6 +77,14 @@ function rememberUserChoices() {
 
 function updateDownloadButtons() {
     const buttonContainer = document.getElementById('downloadActionButtons');
+    console.log('updateDownloadButtons called, selectedDownloads.size:', selectedDownloads.size);
+    console.log('buttonContainer:', buttonContainer);
+
+    if (!buttonContainer) {
+        console.error('Button container not found!');
+        return;
+    }
+
     buttonContainer.innerHTML = '';
     buttonContainer.style.display = 'flex';
 
@@ -86,14 +94,19 @@ function updateDownloadButtons() {
 
     if (selectedDownloads.size === 0) {
         // No selection: gray disabled button
+        console.log('Creating disabled button');
         const disabledBtn = document.createElement('button');
         disabledBtn.textContent = 'Download & Apply';
         disabledBtn.disabled = true;
         buttonContainer.appendChild(disabledBtn);
+        console.log('Disabled button added, disabled:', disabledBtn.disabled);
     } else if (selectedDownloads.size === 1) {
         // Single selection: Download & Apply button
+        console.log('Creating enabled button for single selection');
         const applyBtn = document.createElement('button');
         applyBtn.textContent = 'Download & Apply';
+        applyBtn.disabled = false;
+        applyBtn.removeAttribute('disabled');
         applyBtn.addEventListener('click', async () => {
             if (!window.pywebview || !window.pywebview.api) {
                 showError('PyWebView API not available. Please restart the application.');
@@ -113,8 +126,11 @@ function updateDownloadButtons() {
         buttonContainer.appendChild(applyBtn);
     } else {
         // Multiple selection: Download only
+        console.log('Creating enabled button for multiple selection');
         const downloadBtn = document.createElement('button');
         downloadBtn.textContent = `Download (${selectedDownloads.size})`;
+        downloadBtn.disabled = false;
+        downloadBtn.removeAttribute('disabled');
         downloadBtn.addEventListener('click', async () => {
             if (!window.pywebview || !window.pywebview.api) {
                 showError('PyWebView API not available. Please restart the application.');
@@ -138,6 +154,7 @@ function updateDownloadButtons() {
 
 function updateLocalButtons() {
     const buttonContainer = document.getElementById('localActionButtons');
+    console.log('updateLocalButtons called, selectedLocal.size:', selectedLocal.size);
     buttonContainer.innerHTML = '';
     buttonContainer.style.display = 'flex';
 
@@ -153,6 +170,8 @@ function updateLocalButtons() {
         // Single selection: Apply button
         const applyBtn = document.createElement('button');
         applyBtn.textContent = 'Apply';
+        applyBtn.disabled = false;
+        applyBtn.removeAttribute('disabled');
         applyBtn.addEventListener('click', async () => {
             if (!window.pywebview || !window.pywebview.api) {
                 showError('PyWebView API not available. Please restart the application.');
@@ -198,6 +217,7 @@ function loadWallpaper(id, thumbnail) {
 
     // Add selection click listener
     card.addEventListener('click', () => {
+        console.log('Card clicked:', id);
         if (selectedDownloads.has(id)) {
             selectedDownloads.delete(id);
             card.classList.remove('selected');
@@ -205,6 +225,7 @@ function loadWallpaper(id, thumbnail) {
             selectedDownloads.add(id);
             card.classList.add('selected');
         }
+        console.log('After click, selectedDownloads.size:', selectedDownloads.size);
         updateDownloadButtons();
     });
 
@@ -228,6 +249,7 @@ function loadLocalWallpaper(name, base64src) {
 
     // Add selection click listener
     card.addEventListener('click', () => {
+        console.log('Local card clicked:', name);
         if (selectedLocal.has(name)) {
             selectedLocal.delete(name);
             card.classList.remove('selected');
@@ -235,6 +257,7 @@ function loadLocalWallpaper(name, base64src) {
             selectedLocal.add(name);
             card.classList.add('selected');
         }
+        console.log('After click, selectedLocal.size:', selectedLocal.size);
         updateLocalButtons();
     });
 
@@ -432,6 +455,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     // Hide local buttons, show download buttons
                     document.getElementById('localActionButtons').style.display = 'none';
                     document.getElementById('downloadActionButtons').style.display = 'flex';
+                    updateDownloadButtons();
                     break;
                 case 'local':
                     console.log('Switching to local tab');
@@ -439,6 +463,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     // Hide download buttons, show local buttons
                     document.getElementById('downloadActionButtons').style.display = 'none';
                     document.getElementById('localActionButtons').style.display = 'flex';
+                    updateLocalButtons();
                     break;
             }
         });
