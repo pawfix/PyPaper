@@ -29,6 +29,10 @@ function hideError() {
 
 // Load saved values from localStorage into input fields
 function getReceivedData() {
+    if (typeof Storage === 'undefined' || !window.localStorage) {
+        console.warn("NO storage")
+        return
+    }
     const apiInput = document.getElementById('apiKey');
     const saveDirInput = document.getElementById('saveDir');
     const purityInput = document.getElementById('purity');
@@ -52,6 +56,10 @@ function getReceivedData() {
 
 // Save user choices to localStorage
 function rememberUserChoices() {
+    if (typeof Storage === 'undefined' || !window.localStorage) {
+        console.warn("NO storage")
+        return
+    }
     const api = document.getElementById('apiKey').value;
     const saveDir = document.getElementById('saveDir').value;
     const purity = document.getElementById('purity').value;
