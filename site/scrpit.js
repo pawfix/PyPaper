@@ -78,18 +78,19 @@ function rememberUserChoices() {
 function updateDownloadButtons() {
     const buttonContainer = document.getElementById('downloadActionButtons');
     buttonContainer.innerHTML = '';
-
-    if (selectedDownloads.size === 0) {
-        buttonContainer.style.display = 'none';
-        return;
-    }
-
     buttonContainer.style.display = 'flex';
 
     const saveDir = document.getElementById('saveDir').value || './images';
     const handler = document.getElementById('handler').value;
+    const isDisabled = selectedDownloads.size === 0;
 
-    if (selectedDownloads.size === 1) {
+    if (selectedDownloads.size === 0) {
+        // No selection: gray disabled button
+        const disabledBtn = document.createElement('button');
+        disabledBtn.textContent = 'Download & Apply';
+        disabledBtn.disabled = true;
+        buttonContainer.appendChild(disabledBtn);
+    } else if (selectedDownloads.size === 1) {
         // Single selection: Download & Apply button
         const applyBtn = document.createElement('button');
         applyBtn.textContent = 'Download & Apply';
@@ -138,17 +139,17 @@ function updateDownloadButtons() {
 function updateLocalButtons() {
     const buttonContainer = document.getElementById('localActionButtons');
     buttonContainer.innerHTML = '';
-
-    if (selectedLocal.size === 0) {
-        buttonContainer.style.display = 'none';
-        return;
-    }
-
     buttonContainer.style.display = 'flex';
 
     const handler = document.getElementById('localHandler').value;
 
-    if (selectedLocal.size === 1) {
+    if (selectedLocal.size === 0) {
+        // No selection: gray disabled button
+        const disabledBtn = document.createElement('button');
+        disabledBtn.textContent = 'Apply';
+        disabledBtn.disabled = true;
+        buttonContainer.appendChild(disabledBtn);
+    } else if (selectedLocal.size === 1) {
         // Single selection: Apply button
         const applyBtn = document.createElement('button');
         applyBtn.textContent = 'Apply';
@@ -171,12 +172,11 @@ function updateLocalButtons() {
         });
         buttonContainer.appendChild(applyBtn);
     } else {
-        // Multiple selection: no button (can't apply multiple at once)
-        const info = document.createElement('p');
-        info.textContent = `${selectedLocal.size} selected (can only apply one at a time)`;
-        info.style.color = '#aaa';
-        info.style.textAlign = 'center';
-        buttonContainer.appendChild(info);
+        // Multiple selection: disabled button with info
+        const disabledBtn = document.createElement('button');
+        disabledBtn.textContent = 'Apply (Select one at a time)';
+        disabledBtn.disabled = true;
+        buttonContainer.appendChild(disabledBtn);
     }
 }
 
@@ -365,9 +365,9 @@ document.addEventListener('DOMContentLoaded', function () {
     // Load saved values from localStorage
     getReceivedData();
 
-    // Initialize button visibility (show download buttons by default)
-    document.getElementById('downloadActionButtons').style.display = 'flex';
-    document.getElementById('localActionButtons').style.display = 'none';
+    // Initialize buttons
+    updateDownloadButtons();
+    updateLocalButtons();
 
     // Download button
     const sendBtn = document.getElementById('sendBtn');
