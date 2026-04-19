@@ -7,7 +7,7 @@ def search_wallpapers(query, api_key=None, purity=None):
     params = {
         "q": query,
         "categories": "111",
-        "sorting": "toplist",
+        "sorting": "random",
         "order": "desc"
     }
 
