@@ -86,7 +86,11 @@ function updateDownloadButtons() {
     }
 
     buttonContainer.innerHTML = '';
-    buttonContainer.style.display = 'flex';
+
+    // Only update display if we're currently showing this tab
+    if (buttonContainer.style.display !== 'none') {
+        buttonContainer.style.display = 'flex';
+    }
 
     const saveDir = document.getElementById('saveDir').value || './images';
     const handler = document.getElementById('handler').value;
@@ -156,7 +160,11 @@ function updateLocalButtons() {
     const buttonContainer = document.getElementById('localActionButtons');
     console.log('updateLocalButtons called, selectedLocal.size:', selectedLocal.size);
     buttonContainer.innerHTML = '';
-    buttonContainer.style.display = 'flex';
+
+    // Only update display if we're currently showing this tab
+    if (buttonContainer.style.display !== 'none') {
+        buttonContainer.style.display = 'flex';
+    }
 
     const handler = document.getElementById('localHandler').value;
 
@@ -388,7 +396,10 @@ document.addEventListener('DOMContentLoaded', function () {
     // Load saved values from localStorage
     getReceivedData();
 
-    // Initialize buttons
+    // Initialize buttons - show download by default, hide local
+    document.getElementById('downloadActionButtons').style.display = 'flex';
+    document.getElementById('localActionButtons').style.display = 'none';
+
     updateDownloadButtons();
     updateLocalButtons();
 
