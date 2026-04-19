@@ -44,12 +44,12 @@ function getReceivedData() {
     const handler = localStorage.getItem('handler');
     const localHandler = localStorage.getItem('localHandler');
 
-    // Set input values if they exist
-    if (api) apiInput.value = api;
-    if (saveDir) saveDirInput.value = saveDir;
-    if (purity) purityInput.value = purity;
-    if (handler) handlerInput.value = handler;
-    if (localHandler) localHandlerInput.value = localHandler;
+    // Set input values if they exist and are not null/empty
+    if (api !== null && api !== '') apiInput.value = api;
+    if (saveDir !== null && saveDir !== '') saveDirInput.value = saveDir;
+    if (purity !== null && purity !== '') purityInput.value = purity;
+    if (handler !== null && handler !== '') handlerInput.value = handler;
+    if (localHandler !== null && localHandler !== '') localHandlerInput.value = localHandler;
 }
 
 // Save user choices to localStorage
