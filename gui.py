@@ -50,6 +50,17 @@ class Api():
             ownLog(f"Error applying local wallpaper: {e}")
             raise Exception(f"Failed to apply local wallpaper: {e}")
 
+    def getFiles(self, fileDir):
+        """Get local wallpaper files from directory"""
+        try:
+            ownLog(f"Got dir {fileDir}")
+            dirJson = getLocalFiles(fileDir)
+            ownLog(dirJson)
+            return dirJson
+        except Exception as e:
+            ownLog(f"Error getting local files: {e}")
+            raise Exception(f"Failed to get files: {e}")
+
 api = Api()
 webview.create_window('PyPaper', 'site/index.html', js_api=api)
 webview.start()
