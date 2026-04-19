@@ -15,8 +15,6 @@ const errorMessage = document.getElementById('errorMessage');
 const overlay = document.getElementById('overlay');
 const closeErrorBtn = document.getElementById('closeErrorBtn');
 
-getReceivedData();
-
 // Error popup functions
 function showError(message) {
     errorMessage.textContent = message;
@@ -37,19 +35,19 @@ function getReceivedData() {
     const handlerInput = document.getElementById('handler');
     const localHandlerInput = document.getElementById('localHandler');
 
-    // Get saved values from localStorage
-    const api = localStorage.getItem('api');
-    const saveDir = localStorage.getItem('saveDir');
-    const purity = localStorage.getItem('purity');
-    const handler = localStorage.getItem('handler');
-    const localHandler = localStorage.getItem('localHandler');
+    // Get saved values from localStorage (convert null to empty string)
+    const api = localStorage.getItem('api') || '';
+    const saveDir = localStorage.getItem('saveDir') || '';
+    const purity = localStorage.getItem('purity') || '';
+    const handler = localStorage.getItem('handler') || '';
+    const localHandler = localStorage.getItem('localHandler') || '';
 
-    // Set input values if they exist and are not null/empty
-    if (api !== null && api !== '') apiInput.value = api;
-    if (saveDir !== null && saveDir !== '') saveDirInput.value = saveDir;
-    if (purity !== null && purity !== '') purityInput.value = purity;
-    if (handler !== null && handler !== '') handlerInput.value = handler;
-    if (localHandler !== null && localHandler !== '') localHandlerInput.value = localHandler;
+    // Set input values if elements exist
+    if (apiInput) apiInput.value = api;
+    if (saveDirInput) saveDirInput.value = saveDir;
+    if (purityInput) purityInput.value = purity;
+    if (handlerInput) handlerInput.value = handler;
+    if (localHandlerInput) localHandlerInput.value = localHandler;
 }
 
 // Save user choices to localStorage
@@ -355,6 +353,9 @@ window.addEventListener('pywebviewready', function () {
 // Attach event listeners when DOM is loaded
 document.addEventListener('DOMContentLoaded', function () {
     console.log('DOM loaded, attaching event listeners');
+
+    // Load saved values from localStorage
+    getReceivedData();
 
     // Initialize button visibility (show download buttons by default)
     document.getElementById('downloadActionButtons').style.display = 'flex';
