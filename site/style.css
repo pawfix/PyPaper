@@ -192,6 +192,24 @@ button:active {
     transform: scale(0.97);
 }
 
+button:disabled {
+    background: #2a2a2a;
+    color: #666;
+    border-color: #3a3a3a;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+button:disabled:hover {
+    background: #2a2a2a;
+    border-color: #3a3a3a;
+    box-shadow: none;
+}
+
+button:disabled:active {
+    transform: none;
+}
+
 /* SELECT */
 select {
     width: 100%;
