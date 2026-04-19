@@ -5,6 +5,10 @@ const base64srcPathMap = {};
 const remember = document.getElementById('remember');
 let lastSelectedData;
 
+// Selection tracking
+const selectedDownloads = new Set(); // wallpaper IDs
+const selectedLocal = new Set(); // local file names
+
 getReceivedData();
 
 // Load saved values from localStorage into input fields
@@ -13,18 +17,21 @@ function getReceivedData() {
     const saveDirInput = document.getElementById('saveDir');
     const purityInput = document.getElementById('purity');
     const handlerInput = document.getElementById('handler');
+    const localHandlerInput = document.getElementById('localHandler');
 
     // Get saved values from localStorage
     const api = localStorage.getItem('api');
     const saveDir = localStorage.getItem('saveDir');
     const purity = localStorage.getItem('purity');
     const handler = localStorage.getItem('handler');
+    const localHandler = localStorage.getItem('localHandler');
 
     // Set input values if they exist
     if (api) apiInput.value = api;
     if (saveDir) saveDirInput.value = saveDir;
     if (purity) purityInput.value = purity;
     if (handler) handlerInput.value = handler;
+    if (localHandler) localHandlerInput.value = localHandler;
 }
 
 // Save user choices to localStorage
@@ -33,24 +40,91 @@ function rememberUserChoices() {
     const saveDir = document.getElementById('saveDir').value;
     const purity = document.getElementById('purity').value;
     const handler = document.getElementById('handler').value;
+    const localHandler = document.getElementById('localHandler').value;
 
     if (remember.checked) {
-        if (remember.checked) {
-            localStorage.setItem('api', api);
-            localStorage.setItem('saveDir', saveDir);
-            localStorage.setItem('purity', purity);
-            localStorage.setItem('handler', handler);
-        } else {
-            localStorage.removeItem('api');
-            localStorage.removeItem('saveDir');
-            localStorage.removeItem('purity');
-            localStorage.removeItem('handler');
-        }
+        localStorage.setItem('api', api);
+        localStorage.setItem('saveDir', saveDir);
+        localStorage.setItem('purity', purity);
+        localStorage.setItem('handler', handler);
+        localStorage.setItem('localHandler', localHandler);
+    }
+}
+
+function updateDownloadButtons() {
+    const buttonContainer = document.getElementById('downloadActionButtons');
+    buttonContainer.innerHTML = '';
+
+    if (selectedDownloads.size === 0) {
+        return;
+    }
+
+    const saveDir = document.getElementById('saveDir').value || './images';
+    const handler = document.getElementById('handler').value;
+
+    if (selectedDownloads.size === 1) {
+        // Single selection: Download & Apply button
+        const applyBtn = document.createElement('button');
+        applyBtn.textContent = 'Download & Apply';
+        applyBtn.addEventListener('click', async () => {
+            const id = Array.from(selectedDownloads)[0];
+            await window.pywebview.api.setWallpaper(id, saveDir, handler);
+            selectedDownloads.clear();
+            document.querySelectorAll('.card.selected').forEach(c => c.classList.remove('selected'));
+            updateDownloadButtons();
+        });
+        buttonContainer.appendChild(applyBtn);
+    } else {
+        // Multiple selection: Download only
+        const downloadBtn = document.createElement('button');
+        downloadBtn.textContent = `Download (${selectedDownloads.size})`;
+        downloadBtn.addEventListener('click', async () => {
+            for (const id of selectedDownloads) {
+                await window.pywebview.api.downloadWallpaper(id, saveDir);
+            }
+            selectedDownloads.clear();
+            document.querySelectorAll('.card.selected').forEach(c => c.classList.remove('selected'));
+            updateDownloadButtons();
+        });
+        buttonContainer.appendChild(downloadBtn);
+    }
+}
+
+function updateLocalButtons() {
+    const buttonContainer = document.getElementById('localActionButtons');
+    buttonContainer.innerHTML = '';
+
+    if (selectedLocal.size === 0) {
+        return;
+    }
+
+    const handler = document.getElementById('localHandler').value;
+
+    if (selectedLocal.size === 1) {
+        // Single selection: Apply button
+        const applyBtn = document.createElement('button');
+        applyBtn.textContent = 'Apply';
+        applyBtn.addEventListener('click', async () => {
+            const name = Array.from(selectedLocal)[0];
+            const filePath = base64srcPathMap[name];
+            await window.pywebview.api.applyLocalWallpaper(filePath, handler);
+            selectedLocal.clear();
+            document.querySelectorAll('#localContainer .card.selected').forEach(c => c.classList.remove('selected'));
+            updateLocalButtons();
+        });
+        buttonContainer.appendChild(applyBtn);
+    } else {
+        // Multiple selection: no button (can't apply multiple at once)
+        const info = document.createElement('p');
+        info.textContent = `${selectedLocal.size} selected (can only apply one at a time)`;
+        info.style.color = '#aaa';
+        info.style.textAlign = 'center';
+        buttonContainer.appendChild(info);
     }
 }
 
 function loadWallpaper(id, thumbnail) {
-    // Create the card element instead of using innerHTML string
+    // Create the card element 
     const card = document.createElement('div');
     card.className = 'card';
     card.id = id;
@@ -65,36 +139,24 @@ function loadWallpaper(id, thumbnail) {
     card.appendChild(title);
     card.appendChild(img);
 
-    const hander = document.getElementById('handler').value
-
-    console.log(hander)
-    // Add click listener to log id
+    // Add selection click listener
     card.addEventListener('click', () => {
-        const saveDir = document.getElementById('saveDir').value || './images';
-        window.pywebview.api.setWallpaper(card.id, saveDir, hander);
+        if (selectedDownloads.has(id)) {
+            selectedDownloads.delete(id);
+            card.classList.remove('selected');
+        } else {
+            selectedDownloads.add(id);
+            card.classList.add('selected');
+        }
+        updateDownloadButtons();
     });
 
     container.appendChild(card);
 }
-function applyLocalWallpaper(cardId, filePath) {
-    window.pywebview.api.setWallpaper(filePath)
-    
-        .then(() => {
-            console.log(`Applied local wallpaper: ${cardId}`);
-        })
-        .catch(err => {
-            console.error("Failed to apply local wallpaper:", err);
-        });
-    card.addEventListener('click', () => {
-        const filePath = base64srcPathMap[name]; // absolute path from Python
-        window.pywebview.api.applyLocalWallpaper(filePath)  // <-- call new function
-            .then(() => console.log(`Applied local wallpaper: ${name}`))
-            .catch(err => console.error("Failed to apply local wallpaper:", err));
-        });
-}
+
 function loadLocalWallpaper(name, base64src) {
     const card = document.createElement('div');
-    card.className = 'card'; // same style as API cards
+    card.className = 'card';
     card.id = name;
 
     const title = document.createElement('h1');
@@ -107,12 +169,16 @@ function loadLocalWallpaper(name, base64src) {
     card.appendChild(title);
     card.appendChild(img);
 
-    // Click to apply local wallpaper (no download)
+    // Add selection click listener
     card.addEventListener('click', () => {
-        const filePath = base64srcPathMap[name];
-        window.pywebview.api.applyLocalWallpaper(filePath)
-            .then(() => console.log(`Applied local wallpaper: ${name}`))
-            .catch(err => console.error("Failed to apply local wallpaper:", err));
+        if (selectedLocal.has(name)) {
+            selectedLocal.delete(name);
+            card.classList.remove('selected');
+        } else {
+            selectedLocal.add(name);
+            card.classList.add('selected');
+        }
+        updateLocalButtons();
     });
 
     localContainer.appendChild(card);
@@ -121,13 +187,15 @@ function loadLocalWallpaper(name, base64src) {
 function displayDataError(errorMsg) {
     container.innerHTML = "<h2>Error: " + errorMsg + "</h2>";
 }
+
 function displayData(json) {
     container.innerHTML = ""
+    selectedDownloads.clear();
+    updateDownloadButtons();
 
     for (const wallpaper of json.data.data) {
         loadWallpaper(wallpaper.id, wallpaper.thumbs.small)
     }
-
 }
 
 function displayFileDataError(errorMsg) {
@@ -135,21 +203,21 @@ function displayFileDataError(errorMsg) {
 }
 
 function displayFileData(json) {
-    localContainer.innerHTML = ""; // clear previous
+    localContainer.innerHTML = "";
+    selectedLocal.clear();
+    updateLocalButtons();
 
     const namesArray = json.id[0];
     const srcArray = json.id[1];
 
     for (let i = 0; i < Math.min(namesArray.length, srcArray.length); i++) {
         const name = namesArray[i].name;
-        const srcObj = srcArray[i]; 
+        const srcObj = srcArray[i];
 
         base64srcPathMap[name] = srcObj.filePath;
-
         loadLocalWallpaper(name, srcObj.src);
     }
 }
-
 
 async function getData(input, api, purity) {
     try {
@@ -247,9 +315,7 @@ window.addEventListener('pywebviewready', function () {
         getFiles(localFileDir)
     })
 
-
 });
-
 
 const main = document.getElementById('main')
 const header = document.querySelector('header')
@@ -272,5 +338,6 @@ header.addEventListener('click', function (event) {
 
     }
 })
+
 
 
