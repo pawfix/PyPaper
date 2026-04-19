@@ -3,6 +3,8 @@ const container = document.getElementById("container")
 const localContainer = document.getElementById('localContainer');
 const base64srcPathMap = {};
 const remember = document.getElementById('remember');
+let lastSelectedData;
+
 getReceivedData();
 
 // Load saved values from localStorage into input fields
@@ -31,14 +33,19 @@ function rememberUserChoices() {
     const saveDir = document.getElementById('saveDir').value;
     const purity = document.getElementById('purity').value;
     const handler = document.getElementById('handler').value;
-    const remember = document.getElementById('remember'); // checkbox for "remember me"
 
     if (remember.checked) {
-        localStorage.setItem('api', api);
-        localStorage.setItem('saveDir', saveDir);
-        localStorage.setItem('purity', purity);
-        localStorage.setItem('handler', handler);
-        console.log("Saved user choices");
+        if (remember.checked) {
+            localStorage.setItem('api', api);
+            localStorage.setItem('saveDir', saveDir);
+            localStorage.setItem('purity', purity);
+            localStorage.setItem('handler', handler);
+        } else {
+            localStorage.removeItem('api');
+            localStorage.removeItem('saveDir');
+            localStorage.removeItem('purity');
+            localStorage.removeItem('handler');
+        }
     }
 }
 
@@ -210,12 +217,25 @@ window.addEventListener('pywebviewready', function () {
     const sendBtn = document.getElementById('sendBtn');
 
     sendBtn.addEventListener('click', async function () {
-        const input = document.getElementById('userInput').value;
-        const api = document.getElementById('apiKey').value;
-        const purity = document.getElementById("purity").value
+        const currentData = {
+            input: document.getElementById('userInput').value,
+            api: document.getElementById('apiKey').value,
+            purity: document.getElementById('purity').value
+        };
 
-        getData(input, api, purity);
-        rememberUserChoices();
+        if (
+            lastSelectedData &&
+            currentData.input === lastSelectedData.input &&
+            currentData.api === lastSelectedData.api &&
+            currentData.purity === lastSelectedData.purity
+        ) {
+            return;
+        }
+
+        lastSelectedData = currentData;
+
+        getData(currentData.input, currentData.api, currentData.purity);
+        rememberUserChoices ();
     });
 
     // Local part
