@@ -78,7 +78,6 @@ function rememberUserChoices() {
 function updateDownloadButtons() {
     const buttonContainer = document.getElementById('downloadActionButtons');
     console.log('updateDownloadButtons called, selectedDownloads.size:', selectedDownloads.size);
-    console.log('buttonContainer:', buttonContainer);
 
     if (!buttonContainer) {
         console.error('Button container not found!');
@@ -87,101 +86,114 @@ function updateDownloadButtons() {
 
     buttonContainer.innerHTML = '';
     buttonContainer.style.display = 'flex';
-    buttonContainer.appendChild(disabledBtn);
-    console.log('Disabled button added, disabled:', disabledBtn.disabled);
-} else if (selectedDownloads.size === 1) {
-    // Single selection: Download & Apply button
-    console.log('Creating enabled button for single selection');
-    const applyBtn = document.createElement('button');
-    applyBtn.textContent = 'Download & Apply';
-    applyBtn.disabled = false;
-    applyBtn.removeAttribute('disabled');
-    applyBtn.addEventListener('click', async () => {
-        if (!window.pywebview || !window.pywebview.api) {
-            showError('PyWebView API not available. Please restart the application.');
-            return;
-        }
-        try {
-            const id = Array.from(selectedDownloads)[0];
-            await window.pywebview.api.setWallpaper(id, saveDir, handler);
-            selectedDownloads.clear();
-            document.querySelectorAll('.card.selected').forEach(c => c.classList.remove('selected'));
-            updateDownloadButtons();
-        } catch (error) {
-            console.error('Error applying wallpaper:', error);
-            showError(`Failed to apply wallpaper: ${error.message || 'Unknown error'}`);
-        }
-    });
-    buttonContainer.appendChild(applyBtn);
-} else {
-    // Multiple selection: Download only
-    console.log('Creating enabled button for multiple selection');
-    const downloadBtn = document.createElement('button');
-    downloadBtn.textContent = `Download (${selectedDownloads.size})`;
-    downloadBtn.disabled = false;
-    downloadBtn.removeAttribute('disabled');
-    downloadBtn.addEventListener('click', async () => {
-        if (!window.pywebview || !window.pywebview.api) {
-            showError('PyWebView API not available. Please restart the application.');
-            return;
-        }
-        try {
-            for (const id of selectedDownloads) {
-                await window.pywebview.api.downloadWallpaper(id, saveDir);
+
+    const saveDir = document.getElementById('saveDir').value || './images';
+    const handler = document.getElementById('handler').value;
+
+    if (selectedDownloads.size === 0) {
+        // No selection: gray disabled button
+        const disabledBtn = document.createElement('button');
+        disabledBtn.textContent = 'Download & Apply';
+        disabledBtn.disabled = true;
+        buttonContainer.appendChild(disabledBtn);
+    } else if (selectedDownloads.size === 1) {
+        // Single selection: Download & Apply button
+        const applyBtn = document.createElement('button');
+        applyBtn.textContent = 'Download & Apply';
+        applyBtn.disabled = false;
+        applyBtn.addEventListener('click', async () => {
+            if (!window.pywebview || !window.pywebview.api) {
+                showError('PyWebView API not available. Please restart the application.');
+                return;
             }
-            selectedDownloads.clear();
-            document.querySelectorAll('.card.selected').forEach(c => c.classList.remove('selected'));
-            updateDownloadButtons();
-        } catch (error) {
-            console.error('Error downloading wallpapers:', error);
-            showError(`Failed to download wallpapers: ${error.message || 'Unknown error'}`);
-        }
-    });
-    buttonContainer.appendChild(downloadBtn);
-}
+            try {
+                const id = Array.from(selectedDownloads)[0];
+                await window.pywebview.api.setWallpaper(id, saveDir, handler);
+                selectedDownloads.clear();
+                document.querySelectorAll('.card.selected').forEach(c => c.classList.remove('selected'));
+                updateDownloadButtons();
+            } catch (error) {
+                console.error('Error applying wallpaper:', error);
+                showError(`Failed to apply wallpaper: ${error.message || 'Unknown error'}`);
+            }
+        });
+        buttonContainer.appendChild(applyBtn);
+    } else {
+        // Multiple selection: Download only
+        const downloadBtn = document.createElement('button');
+        downloadBtn.textContent = `Download (${selectedDownloads.size})`;
+        downloadBtn.disabled = false;
+        downloadBtn.addEventListener('click', async () => {
+            if (!window.pywebview || !window.pywebview.api) {
+                showError('PyWebView API not available. Please restart the application.');
+                return;
+            }
+            try {
+                for (const id of selectedDownloads) {
+                    await window.pywebview.api.downloadWallpaper(id, saveDir);
+                }
+                selectedDownloads.clear();
+                document.querySelectorAll('.card.selected').forEach(c => c.classList.remove('selected'));
+                updateDownloadButtons();
+            } catch (error) {
+                console.error('Error downloading wallpapers:', error);
+                showError(`Failed to download wallpapers: ${error.message || 'Unknown error'}`);
+            }
+        });
+        buttonContainer.appendChild(downloadBtn);
+    }
 }
 
 function updateLocalButtons() {
     const buttonContainer = document.getElementById('localActionButtons');
     console.log('updateLocalButtons called, selectedLocal.size:', selectedLocal.size);
+
+    if (!buttonContainer) {
+        console.error('Button container not found!');
+        return;
+    }
+
     buttonContainer.innerHTML = '';
     buttonContainer.style.display = 'flex';
-    // No selection: gray disabled button
-    const disabledBtn = document.createElement('button');
-    disabledBtn.textContent = 'Apply';
-    disabledBtn.disabled = true;
-    buttonContainer.appendChild(disabledBtn);
-} else if (selectedLocal.size === 1) {
-    // Single selection: Apply button
-    const applyBtn = document.createElement('button');
-    applyBtn.textContent = 'Apply';
-    applyBtn.disabled = false;
-    applyBtn.removeAttribute('disabled');
-    applyBtn.addEventListener('click', async () => {
-        if (!window.pywebview || !window.pywebview.api) {
-            showError('PyWebView API not available. Please restart the application.');
-            return;
-        }
-        try {
-            const name = Array.from(selectedLocal)[0];
-            const filePath = base64srcPathMap[name];
-            await window.pywebview.api.applyLocalWallpaper(filePath, handler);
-            selectedLocal.clear();
-            document.querySelectorAll('#localContainer .card.selected').forEach(c => c.classList.remove('selected'));
-            updateLocalButtons();
-        } catch (error) {
-            console.error('Error applying local wallpaper:', error);
-            showError(`Failed to apply local wallpaper: ${error.message || 'Unknown error'}`);
-        }
-    });
-    buttonContainer.appendChild(applyBtn);
-} else {
-    // Multiple selection: disabled button with info
-    const disabledBtn = document.createElement('button');
-    disabledBtn.textContent = 'Apply (Select one at a time)';
-    disabledBtn.disabled = true;
-    buttonContainer.appendChild(disabledBtn);
-}
+
+    const handler = document.getElementById('localHandler').value;
+
+    if (selectedLocal.size === 0) {
+        // No selection: gray disabled button
+        const disabledBtn = document.createElement('button');
+        disabledBtn.textContent = 'Apply';
+        disabledBtn.disabled = true;
+        buttonContainer.appendChild(disabledBtn);
+    } else if (selectedLocal.size === 1) {
+        // Single selection: Apply button
+        const applyBtn = document.createElement('button');
+        applyBtn.textContent = 'Apply';
+        applyBtn.disabled = false;
+        applyBtn.addEventListener('click', async () => {
+            if (!window.pywebview || !window.pywebview.api) {
+                showError('PyWebView API not available. Please restart the application.');
+                return;
+            }
+            try {
+                const name = Array.from(selectedLocal)[0];
+                const filePath = base64srcPathMap[name];
+                await window.pywebview.api.applyLocalWallpaper(filePath, handler);
+                selectedLocal.clear();
+                document.querySelectorAll('#localContainer .card.selected').forEach(c => c.classList.remove('selected'));
+                updateLocalButtons();
+            } catch (error) {
+                console.error('Error applying local wallpaper:', error);
+                showError(`Failed to apply local wallpaper: ${error.message || 'Unknown error'}`);
+            }
+        });
+        buttonContainer.appendChild(applyBtn);
+    } else {
+        // Multiple selection: disabled button with info
+        const disabledBtn = document.createElement('button');
+        disabledBtn.textContent = 'Apply (Select one at a time)';
+        disabledBtn.disabled = true;
+        buttonContainer.appendChild(disabledBtn);
+    }
 }
 
 function loadWallpaper(id, thumbnail) {
