@@ -5,52 +5,183 @@ const base64srcPathMap = {};
 const remember = document.getElementById('remember');
 let lastSelectedData;
 
-getReceivedData();
+// Selection tracking
+const selectedDownloads = new Set(); // wallpaper IDs
+const selectedLocal = new Set(); // local file names
+
+// Error popup elements
+const errorPopup = document.getElementById('errorPopup');
+const errorMessage = document.getElementById('errorMessage');
+const overlay = document.getElementById('overlay');
+const closeErrorBtn = document.getElementById('closeErrorBtn');
+
+// Error popup functions
+function showError(message) {
+    errorMessage.textContent = message;
+    errorPopup.classList.add('show');
+    overlay.classList.add('show');
+}
+
+function hideError() {
+    errorPopup.classList.remove('show');
+    overlay.classList.remove('show');
+}
 
 // Load saved values from localStorage into input fields
 function getReceivedData() {
+    if (typeof Storage === 'undefined' || !window.localStorage) {
+        console.warn("NO storage")
+        return
+    }
     const apiInput = document.getElementById('apiKey');
     const saveDirInput = document.getElementById('saveDir');
     const purityInput = document.getElementById('purity');
     const handlerInput = document.getElementById('handler');
+    const localHandlerInput = document.getElementById('localHandler');
 
-    // Get saved values from localStorage
-    const api = localStorage.getItem('api');
-    const saveDir = localStorage.getItem('saveDir');
-    const purity = localStorage.getItem('purity');
-    const handler = localStorage.getItem('handler');
+    // Get saved values from localStorage (convert null to empty string)
+    const api = localStorage.getItem('api') || '';
+    const saveDir = localStorage.getItem('saveDir') || '';
+    const purity = localStorage.getItem('purity') || '';
+    const handler = localStorage.getItem('handler') || '';
+    const localHandler = localStorage.getItem('localHandler') || '';
 
-    // Set input values if they exist
-    if (api) apiInput.value = api;
-    if (saveDir) saveDirInput.value = saveDir;
-    if (purity) purityInput.value = purity;
-    if (handler) handlerInput.value = handler;
+    // Set input values if elements exist
+    if (apiInput) apiInput.value = api;
+    if (saveDirInput) saveDirInput.value = saveDir;
+    if (purityInput) purityInput.value = purity;
+    if (handlerInput) handlerInput.value = handler;
+    if (localHandlerInput) localHandlerInput.value = localHandler;
 }
 
 // Save user choices to localStorage
 function rememberUserChoices() {
+    if (typeof Storage === 'undefined' || !window.localStorage) {
+        console.warn("NO storage")
+        return
+    }
     const api = document.getElementById('apiKey').value;
     const saveDir = document.getElementById('saveDir').value;
     const purity = document.getElementById('purity').value;
     const handler = document.getElementById('handler').value;
+    const localHandler = document.getElementById('localHandler').value;
 
     if (remember.checked) {
-        if (remember.checked) {
-            localStorage.setItem('api', api);
-            localStorage.setItem('saveDir', saveDir);
-            localStorage.setItem('purity', purity);
-            localStorage.setItem('handler', handler);
-        } else {
-            localStorage.removeItem('api');
-            localStorage.removeItem('saveDir');
-            localStorage.removeItem('purity');
-            localStorage.removeItem('handler');
-        }
+        localStorage.setItem('api', api);
+        localStorage.setItem('saveDir', saveDir);
+        localStorage.setItem('purity', purity);
+        localStorage.setItem('handler', handler);
+        localStorage.setItem('localHandler', localHandler);
+    }
+}
+
+function updateDownloadButtons() {
+    const buttonContainer = document.getElementById('downloadActionButtons');
+    buttonContainer.innerHTML = '';
+
+    if (selectedDownloads.size === 0) {
+        buttonContainer.style.display = 'none';
+        return;
+    }
+
+    buttonContainer.style.display = 'flex';
+
+    const saveDir = document.getElementById('saveDir').value || './images';
+    const handler = document.getElementById('handler').value;
+
+    if (selectedDownloads.size === 1) {
+        // Single selection: Download & Apply button
+        const applyBtn = document.createElement('button');
+        applyBtn.textContent = 'Download & Apply';
+        applyBtn.addEventListener('click', async () => {
+            if (!window.pywebview || !window.pywebview.api) {
+                showError('PyWebView API not available. Please restart the application.');
+                return;
+            }
+            try {
+                const id = Array.from(selectedDownloads)[0];
+                await window.pywebview.api.setWallpaper(id, saveDir, handler);
+                selectedDownloads.clear();
+                document.querySelectorAll('.card.selected').forEach(c => c.classList.remove('selected'));
+                updateDownloadButtons();
+            } catch (error) {
+                console.error('Error applying wallpaper:', error);
+                showError(`Failed to apply wallpaper: ${error.message || 'Unknown error'}`);
+            }
+        });
+        buttonContainer.appendChild(applyBtn);
+    } else {
+        // Multiple selection: Download only
+        const downloadBtn = document.createElement('button');
+        downloadBtn.textContent = `Download (${selectedDownloads.size})`;
+        downloadBtn.addEventListener('click', async () => {
+            if (!window.pywebview || !window.pywebview.api) {
+                showError('PyWebView API not available. Please restart the application.');
+                return;
+            }
+            try {
+                for (const id of selectedDownloads) {
+                    await window.pywebview.api.downloadWallpaper(id, saveDir);
+                }
+                selectedDownloads.clear();
+                document.querySelectorAll('.card.selected').forEach(c => c.classList.remove('selected'));
+                updateDownloadButtons();
+            } catch (error) {
+                console.error('Error downloading wallpapers:', error);
+                showError(`Failed to download wallpapers: ${error.message || 'Unknown error'}`);
+            }
+        });
+        buttonContainer.appendChild(downloadBtn);
+    }
+}
+
+function updateLocalButtons() {
+    const buttonContainer = document.getElementById('localActionButtons');
+    buttonContainer.innerHTML = '';
+
+    if (selectedLocal.size === 0) {
+        buttonContainer.style.display = 'none';
+        return;
+    }
+
+    buttonContainer.style.display = 'flex';
+
+    const handler = document.getElementById('localHandler').value;
+
+    if (selectedLocal.size === 1) {
+        // Single selection: Apply button
+        const applyBtn = document.createElement('button');
+        applyBtn.textContent = 'Apply';
+        applyBtn.addEventListener('click', async () => {
+            if (!window.pywebview || !window.pywebview.api) {
+                showError('PyWebView API not available. Please restart the application.');
+                return;
+            }
+            try {
+                const name = Array.from(selectedLocal)[0];
+                const filePath = base64srcPathMap[name];
+                await window.pywebview.api.applyLocalWallpaper(filePath, handler);
+                selectedLocal.clear();
+                document.querySelectorAll('#localContainer .card.selected').forEach(c => c.classList.remove('selected'));
+                updateLocalButtons();
+            } catch (error) {
+                console.error('Error applying local wallpaper:', error);
+                showError(`Failed to apply local wallpaper: ${error.message || 'Unknown error'}`);
+            }
+        });
+        buttonContainer.appendChild(applyBtn);
+    } else {
+        // Multiple selection: no button (can't apply multiple at once)
+        const info = document.createElement('p');
+        info.textContent = `${selectedLocal.size} selected (can only apply one at a time)`;
+        info.style.color = '#aaa';
+        info.style.textAlign = 'center';
+        buttonContainer.appendChild(info);
     }
 }
 
 function loadWallpaper(id, thumbnail) {
-    // Create the card element instead of using innerHTML string
+    // Create the card element 
     const card = document.createElement('div');
     card.className = 'card';
     card.id = id;
@@ -65,36 +196,24 @@ function loadWallpaper(id, thumbnail) {
     card.appendChild(title);
     card.appendChild(img);
 
-    const hander = document.getElementById('handler').value
-
-    console.log(hander)
-    // Add click listener to log id
+    // Add selection click listener
     card.addEventListener('click', () => {
-        const saveDir = document.getElementById('saveDir').value || './images';
-        window.pywebview.api.setWallpaper(card.id, saveDir, hander);
+        if (selectedDownloads.has(id)) {
+            selectedDownloads.delete(id);
+            card.classList.remove('selected');
+        } else {
+            selectedDownloads.add(id);
+            card.classList.add('selected');
+        }
+        updateDownloadButtons();
     });
 
     container.appendChild(card);
 }
-function applyLocalWallpaper(cardId, filePath) {
-    window.pywebview.api.setWallpaper(filePath)
-    
-        .then(() => {
-            console.log(`Applied local wallpaper: ${cardId}`);
-        })
-        .catch(err => {
-            console.error("Failed to apply local wallpaper:", err);
-        });
-    card.addEventListener('click', () => {
-        const filePath = base64srcPathMap[name]; // absolute path from Python
-        window.pywebview.api.applyLocalWallpaper(filePath)  // <-- call new function
-            .then(() => console.log(`Applied local wallpaper: ${name}`))
-            .catch(err => console.error("Failed to apply local wallpaper:", err));
-        });
-}
+
 function loadLocalWallpaper(name, base64src) {
     const card = document.createElement('div');
-    card.className = 'card'; // same style as API cards
+    card.className = 'card';
     card.id = name;
 
     const title = document.createElement('h1');
@@ -107,12 +226,16 @@ function loadLocalWallpaper(name, base64src) {
     card.appendChild(title);
     card.appendChild(img);
 
-    // Click to apply local wallpaper (no download)
+    // Add selection click listener
     card.addEventListener('click', () => {
-        const filePath = base64srcPathMap[name];
-        window.pywebview.api.applyLocalWallpaper(filePath)
-            .then(() => console.log(`Applied local wallpaper: ${name}`))
-            .catch(err => console.error("Failed to apply local wallpaper:", err));
+        if (selectedLocal.has(name)) {
+            selectedLocal.delete(name);
+            card.classList.remove('selected');
+        } else {
+            selectedLocal.add(name);
+            card.classList.add('selected');
+        }
+        updateLocalButtons();
     });
 
     localContainer.appendChild(card);
@@ -121,13 +244,15 @@ function loadLocalWallpaper(name, base64src) {
 function displayDataError(errorMsg) {
     container.innerHTML = "<h2>Error: " + errorMsg + "</h2>";
 }
+
 function displayData(json) {
     container.innerHTML = ""
+    selectedDownloads.clear();
+    updateDownloadButtons();
 
     for (const wallpaper of json.data.data) {
         loadWallpaper(wallpaper.id, wallpaper.thumbs.small)
     }
-
 }
 
 function displayFileDataError(errorMsg) {
@@ -135,32 +260,40 @@ function displayFileDataError(errorMsg) {
 }
 
 function displayFileData(json) {
-    localContainer.innerHTML = ""; // clear previous
+    localContainer.innerHTML = "";
+    selectedLocal.clear();
+    updateLocalButtons();
 
     const namesArray = json.id[0];
     const srcArray = json.id[1];
 
     for (let i = 0; i < Math.min(namesArray.length, srcArray.length); i++) {
         const name = namesArray[i].name;
-        const srcObj = srcArray[i]; 
+        const srcObj = srcArray[i];
 
         base64srcPathMap[name] = srcObj.filePath;
-
         loadLocalWallpaper(name, srcObj.src);
     }
 }
 
-
 async function getData(input, api, purity) {
+    console.log('getData called with:', { input, api, purity });
+
+    if (!window.pywebview || !window.pywebview.api) {
+        console.error('PyWebView API not available!');
+        displayDataError('PyWebView API not available. Please restart the application.');
+        return;
+    }
+
     try {
         // Call Python method with input
+        console.log('Calling window.pywebview.api.getData...');
         recivedData = await window.pywebview.api.getData(input, api, purity);
-
-        // Show raw response
         console.log("Python response:", recivedData);
 
     } catch (err) {
         console.error("Error calling Python:", err);
+        displayDataError('Failed to communicate with Python backend: ' + err.message);
         return;
     }
 
@@ -186,15 +319,25 @@ async function getData(input, api, purity) {
 }
 
 async function getFiles(dir) {
+    console.log('getFiles called with:', dir);
+
+    if (!window.pywebview || !window.pywebview.api) {
+        console.error('PyWebView API not available!');
+        displayFileDataError('PyWebView API not available. Please restart the application.');
+        return;
+    }
+
     let localFiles;
     try {
+        console.log('Calling window.pywebview.api.getFiles...');
         localFiles = await window.pywebview.api.getFiles(dir);
+        console.log('Local files response:', localFiles);
         if (typeof localFiles === "string") {
             localFiles = JSON.parse(localFiles);
         }
     } catch (e) {
         console.warn("Didn't receive data", e);
-        displayFileDataError("Failed to get local files");
+        displayFileDataError("Failed to get local files: " + e.message);
         return;
     }
 
@@ -212,65 +355,114 @@ async function getFiles(dir) {
 
 // Ensure pywebview API is ready
 window.addEventListener('pywebviewready', function () {
-
-    // Download part
-    const sendBtn = document.getElementById('sendBtn');
-
-    sendBtn.addEventListener('click', async function () {
-        const currentData = {
-            input: document.getElementById('userInput').value,
-            api: document.getElementById('apiKey').value,
-            purity: document.getElementById('purity').value
-        };
-
-        if (
-            lastSelectedData &&
-            currentData.input === lastSelectedData.input &&
-            currentData.api === lastSelectedData.api &&
-            currentData.purity === lastSelectedData.purity
-        ) {
-            return;
-        }
-
-        lastSelectedData = currentData;
-
-        getData(currentData.input, currentData.api, currentData.purity);
-        rememberUserChoices ();
-    });
-
-    // Local part
-    const localBtn = document.getElementById('localFileBtn');
-
-    localBtn.addEventListener('click', async function () {
-        const localFileDir = document.getElementById('localFileDir').value
-
-        getFiles(localFileDir)
-    })
-
-
+    console.log('PyWebView is ready!');
 });
 
+// Attach event listeners when DOM is loaded
+document.addEventListener('DOMContentLoaded', function () {
+    console.log('DOM loaded, attaching event listeners');
 
-const main = document.getElementById('main')
-const header = document.querySelector('header')
+    // Load saved values from localStorage
+    getReceivedData();
 
-header.addEventListener('click', function (event) {
+    // Initialize button visibility (show download buttons by default)
+    document.getElementById('downloadActionButtons').style.display = 'flex';
+    document.getElementById('localActionButtons').style.display = 'none';
 
-    const target = event.target.closest('.headBtn')
+    // Download button
+    const sendBtn = document.getElementById('sendBtn');
+    if (sendBtn) {
+        console.log('Send button found, attaching listener');
+        sendBtn.addEventListener('click', async function () {
+            console.log('Send button clicked!');
+            const currentData = {
+                input: document.getElementById('userInput').value,
+                api: document.getElementById('apiKey').value,
+                purity: document.getElementById('purity').value
+            };
 
-    if (!target) return
+            if (
+                lastSelectedData &&
+                currentData.input === lastSelectedData.input &&
+                currentData.api === lastSelectedData.api &&
+                currentData.purity === lastSelectedData.purity
+            ) {
+                return;
+            }
 
-    switch (target.id) {
+            lastSelectedData = currentData;
 
-        case 'download':
-            main.style.transform = 'translateX(0vw)'
-            break
-
-        case 'local':
-            main.style.transform = 'translateX(-100vw)'
-            break
-
+            getData(currentData.input, currentData.api, currentData.purity);
+            rememberUserChoices();
+        });
+    } else {
+        console.error('Send button not found!');
     }
-})
+
+    // Local button
+    const localBtn = document.getElementById('localFileBtn');
+    if (localBtn) {
+        console.log('Local button found, attaching listener');
+        localBtn.addEventListener('click', async function () {
+            console.log('Local button clicked!');
+            const localFileDir = document.getElementById('localFileDir').value;
+            getFiles(localFileDir);
+        });
+    } else {
+        console.error('Local button not found!');
+    }
+
+    // Header navigation
+    const main = document.getElementById('main');
+    const header = document.querySelector('header');
+
+    if (header) {
+        console.log('Header found, attaching navigation listener');
+        header.addEventListener('click', function (event) {
+            console.log('Header clicked, target:', event.target);
+            const target = event.target.closest('.headBtn') || event.target.closest('h3')?.parentElement;
+            console.log('Closest headBtn:', target);
+
+            if (!target || !target.classList.contains('headBtn')) return;
+
+            switch (target.id) {
+                case 'download':
+                    console.log('Switching to download tab');
+                    main.style.transform = 'translateX(0vw)';
+                    // Hide local buttons, show download buttons
+                    document.getElementById('localActionButtons').style.display = 'none';
+                    document.getElementById('downloadActionButtons').style.display = 'flex';
+                    break;
+                case 'local':
+                    console.log('Switching to local tab');
+                    main.style.transform = 'translateX(-100vw)';
+                    // Hide download buttons, show local buttons
+                    document.getElementById('downloadActionButtons').style.display = 'none';
+                    document.getElementById('localActionButtons').style.display = 'flex';
+                    break;
+            }
+        });
+    } else {
+        console.error('Header not found!');
+    }
+
+    // Error popup close button
+    if (closeErrorBtn) {
+        closeErrorBtn.addEventListener('click', hideError);
+    }
+
+    // Close popup when clicking overlay
+    if (overlay) {
+        overlay.addEventListener('click', hideError);
+    }
+
+    // Close popup on Escape key
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape' && errorPopup.classList.contains('show')) {
+            hideError();
+        }
+    });
+});
+
 
 

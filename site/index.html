@@ -50,14 +50,38 @@
                 </div>
 
                 <div class="container" id="container"></div>
+                <div class="action-buttons" id="downloadActionButtons"></div>
             </section>
 
             <section class="local">
                 <input type="text" name="fileDir" id="localFileDir" placeholder="Enter your wallpaper dir (default: ~/Images)" value="~/Images/">
-                <button id="localFileBtn">Get local wallpapers</button>
+                <div class="controls">
+                    <details class="filters">
+                        <summary>Filters</summary>
+                        <div class="filters-content">
+                            <select name="localHandler" id="localHandler">
+                                <option value="swww">SWWW</option>
+                                <option value="awww">AWWW</option>
+                                <option value="swaybg">swaybg</option>
+                                <option value="hyprpaper">hyprpaper</option>
+                                <option value="wpaperd">wpaperd</option>
+                            </select>
+                        </div>
+                    </details>
+                    <button id="localFileBtn">Get local wallpapers</button>
+                </div>
                 <div class="container" id="localContainer"></div>
+                <div class="action-buttons" id="localActionButtons"></div>
             </section>
         </main>
+
+        <!-- Error Popup -->
+        <div class="overlay" id="overlay"></div>
+        <div class="error-popup" id="errorPopup">
+            <h3>Error</h3>
+            <p id="errorMessage">An error occurred while applying the wallpaper.</p>
+            <button id="closeErrorBtn">Close</button>
+        </div>
 
         <script src="scrpit.js"></script>
 

@@ -187,7 +187,13 @@ def downloadWallpaper(ID: str, called: bool, save_dir: str = None):
         print(f"Downloaded: {filepath}")
 
     except requests.exceptions.RequestException as e:
-        print(f"Failed to download wallpaper {ID}: {e}")
+        error_msg = f"Failed to download wallpaper {ID}: {e}"
+        print(error_msg)
+        raise Exception(error_msg)
+    except Exception as e:
+        error_msg = f"Unexpected error downloading wallpaper {ID}: {e}"
+        print(error_msg)
+        raise Exception(error_msg)
 
     return filepath
 

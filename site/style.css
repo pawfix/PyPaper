@@ -59,6 +59,7 @@ main {
     width: 300vw;
     flex-direction: row;
     transition: transform 0.35s ease;
+    padding-bottom: 100px; /* Space for fixed action buttons */
 }
 
 main section {
@@ -339,6 +340,12 @@ option {
     opacity: 1;
 }
 
+.card.selected {
+    border: 3px solid #FFD700;
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.5), 0 8px 30px rgba(255, 255, 255, 0.1);
+    transform: scale(1.02);
+}
+
 .card img {
     width: 100%;
     height: auto;
@@ -350,4 +357,97 @@ option {
     padding: 10px;
     color: #ccc; 
     word-break: break-all;
+}
+
+/* ACTION BUTTONS AREA */
+.action-buttons {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    gap: 10px;
+    padding: 15px;
+    justify-content: center;
+    min-height: 44px;
+    align-items: center;
+    background: rgba(15, 15, 15, 0.95);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid #333;
+    z-index: 100;
+}
+
+.action-buttons button {
+    padding: 12px 24px;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.action-buttons button:hover {
+    background: #2a2a2a;
+    border-color: #777;
+}
+
+/* ERROR POPUP */
+.error-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #1a1a1a;
+    border: 1px solid #555;
+    border-radius: 10px;
+    padding: 20px;
+    max-width: 500px;
+    width: 90%;
+    z-index: 1000;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    display: none;
+}
+
+.error-popup.show {
+    display: block;
+}
+
+.error-popup h3 {
+    color: #ff6b6b;
+    margin: 0 0 15px 0;
+    font-size: 18px;
+}
+
+.error-popup p {
+    color: #e5e5e5;
+    margin: 0 0 20px 0;
+    line-height: 1.5;
+}
+
+.error-popup button {
+    background: #ff6b6b;
+    border: 1px solid #ff6b6b;
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    float: right;
+}
+
+.error-popup button:hover {
+    background: #ff5252;
+    border-color: #ff5252;
+}
+
+/* OVERLAY */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 999;
+    display: none;
+}
+
+.overlay.show {
+    display: block;
 }
