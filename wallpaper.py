@@ -12,10 +12,10 @@ def runHandler(handler, filepath):
     try:
         match handler:
             case "swww":
-                subprocess.run(["swww", "img", filepath]);
+                subprocess.run(["swww", "img", filepath], check=True);
 
             case 'awww':
-                subprocess.run(["awww", "img", filepath]);
+                subprocess.run(["awww", "img", filepath], check=True);
 
             case 'hyprpaper':
                 subprocess.run([
@@ -23,23 +23,32 @@ def runHandler(handler, filepath):
                     "hyprpaper",
                     "wallpaper",
                     f", {filepath} , [ ]"
-                ])
+                ], check=True);
 
             case 'wpaperd':
-                subprocess.run(["wpaperdctl", "set", filepath])
+                subprocess.run(["wpaperdctl", "set", filepath], check=True);
             
             case 'swaybg':
-                subprocess.run(["swaybg", "-i", filepath])
+                subprocess.run(["swaybg", "-i", filepath], check=True);
             
             case _:
-                print("Handler not supported")
-    except:
-        print("hyprctl hyprpaper wallpaper ',", filepath, ", [ ]'")
-        print("couldnt set wallpaper, maybe daemon isn't running?: ", handler, filepath)
+                raise Exception(f"Handler '{handler}' not supported")
+    except subprocess.CalledProcessError as e:
+        raise Exception(f"Failed to set wallpaper with handler '{handler}': {e}")
+    except FileNotFoundError:
+        raise Exception(f"Handler '{handler}' not found. Make sure it's installed and in PATH.")
+    except Exception as e:
+        raise Exception(f"Error setting wallpaper with handler '{handler}': {e}")
 
 def applyWallpaper(id, handler: str, save_dir: str = None):
-    filepath = downloadWallpaper(id, True, save_dir);
-    if whichWallHandler(handler) is not 0:
+    try:
+        filepath = downloadWallpaper(id, True, save_dir);
+        if not filepath:
+            raise Exception("Failed to download wallpaper")
+        
+        if whichWallHandler(handler) == 0:
+            raise Exception(f"Handler '{handler}' is not available. Make sure it's installed.")
+        
         runHandler(handler, filepath)
-    else:
-        print(handler + "not aviable")
+    except Exception as e:
+        raise Exception(f"Failed to apply wallpaper: {e}")
