@@ -280,11 +280,14 @@ async function getFiles(dir) {
 
 // Ensure pywebview API is ready
 window.addEventListener('pywebviewready', function () {
+    console.log('PyWebView is ready!');
 
     // Download part
     const sendBtn = document.getElementById('sendBtn');
+    console.log('Send button found:', sendBtn);
 
     sendBtn.addEventListener('click', async function () {
+        console.log('Send button clicked!');
         const currentData = {
             input: document.getElementById('userInput').value,
             api: document.getElementById('apiKey').value,
@@ -303,13 +306,15 @@ window.addEventListener('pywebviewready', function () {
         lastSelectedData = currentData;
 
         getData(currentData.input, currentData.api, currentData.purity);
-        rememberUserChoices ();
+        rememberUserChoices();
     });
 
     // Local part
     const localBtn = document.getElementById('localFileBtn');
+    console.log('Local button found:', localBtn);
 
     localBtn.addEventListener('click', async function () {
+        console.log('Local button clicked!');
         const localFileDir = document.getElementById('localFileDir').value
 
         getFiles(localFileDir)
@@ -317,22 +322,26 @@ window.addEventListener('pywebviewready', function () {
 
 });
 
+// Header navigation - moved outside pywebviewready
 const main = document.getElementById('main')
 const header = document.querySelector('header')
 
 header.addEventListener('click', function (event) {
-
+    console.log('Header clicked, target:', event.target);
     const target = event.target.closest('.headBtn')
+    console.log('Closest headBtn:', target);
 
     if (!target) return
 
     switch (target.id) {
 
         case 'download':
+            console.log('Switching to download tab');
             main.style.transform = 'translateX(0vw)'
             break
 
         case 'local':
+            console.log('Switching to local tab');
             main.style.transform = 'translateX(-100vw)'
             break
 
