@@ -401,16 +401,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 purity: document.getElementById('purity').value
             };
 
-            if (
-                lastSelectedData &&
-                currentData.input === lastSelectedData.input &&
-                currentData.api === lastSelectedData.api &&
-                currentData.purity === lastSelectedData.purity
-            ) {
-                return;
-            }
-
-            lastSelectedData = currentData;
 
             getData(currentData.input, currentData.api, currentData.purity);
             rememberUserChoices();
